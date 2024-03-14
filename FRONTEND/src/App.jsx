@@ -1,0 +1,28 @@
+import React from 'react'
+import {BrowserRouter,Route,Routes} from "react-router-dom"
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Group from './pages/Group'
+import Chat from './pages/Chat'
+import Register from './pages/Register'
+import ProtectRoute from './components/Auth/ProtectRoute.jsx'
+import Notfound from './pages/Notfound.jsx'
+const App = () => {
+  let user = true;
+  return (
+    <>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<ProtectRoute user={user} redirect='/login'><Home /></ProtectRoute>}></Route>
+        <Route path='/login' element={<ProtectRoute user={!user} redirect='/'><Login /></ProtectRoute>}></Route>
+        <Route path='/group' element={<ProtectRoute user={user} redirect='/login'><Group /></ProtectRoute>}></Route>
+        <Route path='/chat/:chatID' element={<ProtectRoute user={user} redirect='/login'><Chat /></ProtectRoute>}></Route>
+        <Route path='/register' element={<ProtectRoute user={!user} redirect='/'><Register /></ProtectRoute>}></Route>
+        <Route path='*' element={<Notfound />}></Route>
+      </Routes>
+    </BrowserRouter>
+    </>
+  )
+}
+
+export default App
