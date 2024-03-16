@@ -1,19 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const scrollbarStyle = `
-  ::-webkit-scrollbar {
-    width: 12px;
-  }
 
-  ::-webkit-scrollbar-track {
-    background-color: #2f2f2f;
-  }
 
-  ::-webkit-scrollbar-thumb {
-    background-color: #4f5c57;
-  }
-`;
 
 const Chatlist = () => {
   const Navigate = useNavigate();
@@ -36,15 +25,15 @@ const Chatlist = () => {
 
   return (
     <>
-      <style>{scrollbarStyle}</style>
+      
       {obj.map((element, index) => (
         <div
           key={index}
           style={{
             width: '100%',
             height: '7%',
-            backgroundColor: selectedChat === element.id ? 'grey' : 'black',
-            color: 'white',
+            backgroundColor: selectedChat === element.id ? '#1976d2' : '#F0FFFF',
+            color: selectedChat === element.id ? 'white' : 'black',
             display: 'flex',
             position: 'relative',
             transition: 'background-color 0.3s',

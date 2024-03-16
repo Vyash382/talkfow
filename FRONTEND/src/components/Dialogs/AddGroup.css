@@ -1,0 +1,11 @@
+.user-item {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    transition: background-color 0.3s ease; 
+  }
+  
+  .user-item.selected {
+    background-color: #1976d2; 
+  }
+  

@@ -13,7 +13,7 @@ const AppLayout = () =>(WrappedComponent)=>{
                     height:'92vh',
                     width:'99vw',
                     color:'white',
-                    backgroundColor:'black',
+                    backgroundColor:'white',
                     display:'flex',
                     justifyContent:'space-between',
                     position:"absolute",
@@ -25,7 +25,7 @@ const AppLayout = () =>(WrappedComponent)=>{
                         height:'92vh',
                     width:'17vw',
                     color:'white',
-                    backgroundColor:'#2f2f2f',
+                    backgroundColor:'white',
                     overflowY: 'scroll',
                     display:'flex',
                     flexDirection:'column',
@@ -38,8 +38,8 @@ const AppLayout = () =>(WrappedComponent)=>{
                     style={{
                         height:'92vh',
                     width:'55vw',
-                    color:'white',
-                    backgroundColor:'#4f5c57'
+                    color:'black',
+                    backgroundColor:'white'
                     }}
                 >
                     <WrappedComponent {...props} />
@@ -48,8 +48,8 @@ const AppLayout = () =>(WrappedComponent)=>{
                     style={{
                         height:'92vh',
                     width:'28vw',
-                    color:'white',
-                    backgroundColor:'#2f2f2f'
+                    color:'black',
+                    backgroundColor:'#F0FFFF'
                     }}
                 >
                     <Myself />
