@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Header from './Header';
 import Chatlist from './Chatlist';
-import Myself from './Myself';
-
 const AppLayout = () =>(WrappedComponent)=>{
+    
+     
     return(props) =>{
         return (
             <div>
@@ -37,23 +37,14 @@ const AppLayout = () =>(WrappedComponent)=>{
                 <div
                     style={{
                         height:'92vh',
-                    width:'55vw',
+                    width:'83vw',
                     color:'black',
                     backgroundColor:'white'
                     }}
                 >
                     <WrappedComponent {...props} />
                 </div>
-                <div
-                    style={{
-                        height:'92vh',
-                    width:'28vw',
-                    color:'black',
-                    backgroundColor:'#F0FFFF'
-                    }}
-                >
-                    <Myself />
-                </div>
+                
             </div>
             <div>Footer</div>
             </div>

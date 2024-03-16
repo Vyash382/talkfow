@@ -5,19 +5,34 @@ import { useNavigate } from 'react-router-dom';
 import Search from '../Dialogs/Search';
 import Notifications from '../Dialogs/Notifications';
 import AddGroup from '../Dialogs/AddGroup';
-
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Profile from './Profile';
 const Header = () => {
     const [isSearch, setIsSearch] = useState(false);
     const [isNotification, setIsNotification] = useState(false);
     const [isNewGroup, setIsNewGroup] = useState(false);
+    const [profile,setProfile] = useState(false);
     const navigate = useNavigate();
+    const getP =()=>{
+        if(profile) {
+            return "block";
+        }
+        else {
+            return "none";
+        }
+    }
 
     const handleOnAdd = () => {
         setIsNewGroup(!isNewGroup);
     };
 
     const handleLogout = () => {
-        console.log("Logging Out");
+        if(profile){
+            setProfile(false);
+        }
+        else{
+            setProfile(true);
+        }
     };
 
     const handleOnGroup = () => {
@@ -53,7 +68,7 @@ const Header = () => {
                             <GroupIcon />
                         </IconButton>
                         <IconButton color="inherit" onClick={handleLogout}>
-                            <ExitToAppIcon />
+                        <AccountCircleIcon />
                         </IconButton>
                     </div>
                 </Toolbar>
@@ -61,6 +76,7 @@ const Header = () => {
             {isSearch && <Search ss={setIsSearch} />}
             <Notifications msg={isNotification} msg2={setIsNotification} />
              <AddGroup msg={isNewGroup} msg2={setIsNewGroup} />
+             <Profile msg={profile} />
         </>
     );
 };

@@ -86,8 +86,8 @@ const AddGroup = (props) => {
               </div>
             ))
           )}
-          <Button variant="contained" onClick={handleClose}>Create Group</Button>
-          <Button variant="contained" onClick={handleClose}>Cancel</Button>
+          <Button variant="contained"  onClick={handleClose}>Create Group</Button>
+          <Button variant="contained" color='error' onClick={handleClose}>Cancel</Button>
         </Stack>
       </Dialog>
     </div>

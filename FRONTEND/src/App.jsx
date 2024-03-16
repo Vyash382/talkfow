@@ -7,6 +7,7 @@ import Chat from './pages/Chat'
 import Register from './pages/Register'
 import ProtectRoute from './components/Auth/ProtectRoute.jsx'
 import Notfound from './pages/Notfound.jsx'
+import GroupItem from './pages/GroupItem.jsx'
 const App = () => {
   let user = true;
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path='/group' element={<ProtectRoute user={user} redirect='/login'><Group /></ProtectRoute>}></Route>
         <Route path='/chat/:chatID' element={<ProtectRoute user={user} redirect='/login'><Chat /></ProtectRoute>}></Route>
         <Route path='/register' element={<ProtectRoute user={!user} redirect='/'><Register /></ProtectRoute>}></Route>
+        <Route path='/group/:groupID' element={<ProtectRoute user={user} redirect='/login'><GroupItem /></ProtectRoute>}></Route>
         <Route path='*' element={<Notfound />}></Route>
       </Routes>
     </BrowserRouter>

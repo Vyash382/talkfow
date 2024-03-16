@@ -3,9 +3,20 @@ import React from 'react'
 import AppLayout from '../components/Layouts/AppLayout'
 import { Icon, IconButton, Stack,TextField, Typography } from '@mui/material';
 import { AttachFile, Send } from '@mui/icons-material';
+import Attachh from '../components/Dialogs/Attachh';
 
 const Chat = () => {
   const [user,setUser] = useState(1);
+  const [dbx,setDbx] = useState(false);
+  const dbxHandler = ()=>{
+    if(dbx){
+      setDbx(false);
+    }
+    else {
+      setDbx(true);
+    }
+    console.log(dbx);
+  }
   const messages = [{
     "sender._id":1,
     "content":"Hello"
@@ -68,7 +79,7 @@ const Chat = () => {
     boxSizing={"border-box"}
     padding={"1rem"}
     spacing={"1rem"}
-    bgcolor={"pink"}
+    bgcolor={"#f0f8ff"}
     height={"90%"}
     sx={{
       overflowX:"hidden",
@@ -94,7 +105,7 @@ const Chat = () => {
           ):(
             <div style={{display:"flex",gap:"10px"}}>
               
-            <div  style={{marginLeft:"auto",display:"flex",alignItems:"center",padding:"7px",borderRadius:"5px",backgroundColor:"#00FFFF",minHeight:"50px",height:"auto",width:"auto"}}>
+            <div  style={{marginLeft:"auto",display:"flex",alignItems:"center",padding:"7px",borderRadius:"5px",backgroundColor:"bisque",minHeight:"50px",height:"auto",width:"auto"}}>
     
               {Element.content}
             </div>
@@ -108,10 +119,12 @@ const Chat = () => {
           )
         ))
       }
+      <Attachh msg={dbx} control={setDbx} />
     </Stack>
     <form style={{height:"10%"}}>
-      <Stack direction={"row"} height={"100%"}>
-        <IconButton>
+      <Stack direction={"row"} height={"100%"} >
+        
+        <IconButton onClick={dbxHandler}>
           <AttachFile/>
         </IconButton>
         <TextField

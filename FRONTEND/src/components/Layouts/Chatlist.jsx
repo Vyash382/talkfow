@@ -37,6 +37,7 @@ const Chatlist = () => {
             display: 'flex',
             position: 'relative',
             transition: 'background-color 0.3s',
+            
           }}
           onClick={() => handleClick(element.id)}
         >
