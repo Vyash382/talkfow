@@ -13,8 +13,8 @@ const GroupLayout = (WrappedComponent) => {
     }
     return(
     <div style={{height:'100vh',width:'100vw',display:'flex'}}>
-      <div style={{width:'28vw',backgroundColor:'bisque',overflowY:'auto',display:'flex',flexDirection:'column',gap:'5px',alignItems:'center'}}>
-        <h1 style={{color:'#1976d2'}}>Your Groups</h1>
+      <div style={{width:'28vw',backgroundColor:'azure',overflowY:'auto',display:'flex',flexDirection:'column',gap:'5px',alignItems:'center'}}>
+        <h1 style={{color:'black'}}>Your Groups</h1>
         <Grouplist /></div>
       <div style={{backgroundColor:'#f8f4ff',width:'72vw',height:'100vh'}}>
         <IconButton  onClick={handleClick}>
