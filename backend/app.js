@@ -1,7 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
 import userRoute from './routes/user.js';
+import cors from 'cors'
 const app = express();
+app.use(cors())
 const MONGO_URI = 'mongodb://localhost:27017/talkfow';
 const connectToMongo = async () => {
     try {

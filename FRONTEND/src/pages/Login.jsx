@@ -1,14 +1,16 @@
-// src/components/LoginForm.js
 import React,{useState} from 'react';
 import { Link } from 'react-router-dom';
 import { TextField, Button, FormControl } from '@mui/material';
-
-const Login= () => {
+import Error from './Error.jsx' 
+const Login= (props) => {
+    const {user,setUser} = props;
+    const [dialog,setDialog] = useState(false);
+    const [message,setMessage] = useState('');
+    const [redirect,setRedirect] = useState('');
     const [formData, setFormData] = useState({
         email: '',
-        password: '',
+        password: ''
       });
-    
       const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -17,12 +19,29 @@ const Login= () => {
         }));
       };
     
-      const handleSubmit = (e) => {
+      const handleSubmit = async(e) => {
+        const {email,password} = formData;
         e.preventDefault();
-        // Add your form submission logic here (e.g., API calls, validation, etc.)
-        console.log('Form submitted:', formData);
+        const response = await fetch(`http://localhost:3000/user/login`,{
+          method: "POST",
+            headers:{
+              "Content-Type" : "application/json",
+            },
+            body: JSON.stringify({email,password})
+          } );  
+        const json = await response.json();
+        if(json.status){
+          setUser(true);
+        }
+        else{
+          setMessage(json.content);
+          setRedirect('./');
+          setDialog(true);
+        }
       };
+      
   return (
+    
     <>
     <div style={{height:'100%',width:'100%',position:'fixed',zIndex:'-1'}}>
         <img src="https://www.wallpapertip.com/wmimgs/82-825704_cool-backgrounds-for-twitch.jpg" style={{objectFit:'cover'}} alt="" />
@@ -84,7 +103,8 @@ const Login= () => {
         <div style={{height:'5%',width:'35%',backgroundColor:'blue',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>        <Link to='/register' style={{color:'white',textDecoration:'none'}}>  Create Your Account  </Link>
 </div>
     </div>
-    
+      
+    {dialog && <Error message={message} redirect={redirect}  setDialog={setDialog} />}
     </>
   );
 };

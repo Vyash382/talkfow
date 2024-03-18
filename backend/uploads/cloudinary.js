@@ -6,10 +6,10 @@ cloudinary.config({
   api_secret: "GbGwO1bjOzopu9IXHb2rvpBd62Y"
 });
 const uploadOnCloudinary = async (localpath)=>{
-    console.log(localpath+"gvbhj");
+    // console.log(localpath+"gvbhj");
     try {
         if(!localpath){
-            console.log("here22");
+            // console.log("here22");
             return null;
         } 
         else{

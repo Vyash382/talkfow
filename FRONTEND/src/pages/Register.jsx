@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Error from './Error.jsx'
 const Register = () => {
   const [formData, setFormData] = useState({
     named: '',
     email: '',
     password: '',
   });
+  const [dialog,setDialog] = useState(false);
+    const [message,setMessage] = useState('');
+    const [redirect,setRedirect] = useState('');
 
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
@@ -20,15 +24,40 @@ const Register = () => {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedPhoto(file);
+      setSelectedPhoto(file);                                                             
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here (e.g., API calls, validation, etc.)
-    console.log('Form submitted:', formData, 'Selected Photo:', selectedPhoto);
+    const { named, email, password } = formData; 
+    const formData2 = new FormData();
+    formData2.append('named', named);
+    formData2.append('email', email);
+    formData2.append('password', password);
+    formData2.append('avatar', selectedPhoto);
+    const response = await fetch(`http://localhost:3000/user/signup`,{
+          method: "POST",
+            
+            body: formData2
+          } );  
+        const json = await response.json();
+        if(json.status){
+          setMessage("User registered successfully");
+          setRedirect('./');
+          setDialog(true);
+        }
+        else{
+          setMessage(json.content);
+          setRedirect('./');
+          setDialog(true);
+        }
+        setFormData({named: '',
+        email: '',
+        password: ''});
+        setSelectedPhoto(null);
   };
+  
 
   return (
     <>
@@ -178,6 +207,7 @@ const Register = () => {
 </div>
         
       </div>
+      {dialog && <Error message={message} redirect={redirect}  setDialog={setDialog} />}
     </>
   );
 };

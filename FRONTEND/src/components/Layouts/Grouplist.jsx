@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Grouplist = () => {
     const navigate = useNavigate();
-    const [selectedGroup, setSelectedGroup] = useState(null); // State to store the selected group ID
+    const [selectedGroup, setSelectedGroup] = useState(null); 
     const arr = [];
     const p_pic = "https://th.bing.com/th/id/OIP.y8tWWY6Vh7BX50XtbsIcnwHaFe?rs=1&pid=ImgDetMain";
     
