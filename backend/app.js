@@ -17,5 +17,5 @@ app.listen(3000,()=>{
 })
 app.use('/user',userRoute);
 app.get('/',(req,res)=>{
-    res.json({"a":"Baby"});
+    res.json({"message":"Hello"});
 })
