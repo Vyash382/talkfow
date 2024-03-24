@@ -23,6 +23,7 @@ const Profile = (props) => {
           gap: '4%',
           transition: 'height 0.3s ease-in-out', // Add transition property
           height: props.msg ? '72vh' : '0', // Set initial and final height
+          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)'
         }}
       >
         <Myself />

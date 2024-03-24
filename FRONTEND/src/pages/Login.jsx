@@ -11,6 +11,7 @@ const Login= (props) => {
         email: '',
         password: ''
       });
+      console.log(document.cookie);
       const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -27,8 +28,10 @@ const Login= (props) => {
             headers:{
               "Content-Type" : "application/json",
             },
-            body: JSON.stringify({email,password})
+            body: JSON.stringify({email,password}),
+            credentials: 'include'
           } );  
+          
         const json = await response.json();
         if(json.status){
           setUser(true);
@@ -38,6 +41,7 @@ const Login= (props) => {
           setRedirect('./');
           setDialog(true);
         }
+        console.log(response.headers.accessToken);
       };
       
   return (

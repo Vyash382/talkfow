@@ -34,8 +34,9 @@ const login = async(req,res)=>{
     const loggedInUser = await User.findById(user._id).select("-password");
     const accesstoken = await generateAccessToken(user._id);
     const options = {
-        httpOnly: true,
-        secure: true
+        httpOnly: false,
+        secure: true,
+        sameSite: 'None'
     }
     res.status(400).cookie("accessToken",accesstoken,options).json({status:true,accesstoken,loggedInUser});
     } catch (error) {
@@ -47,7 +48,7 @@ const login = async(req,res)=>{
 const signup = async(req,res)=>{
     try {
         const {named,email,password} = req.body;
-        console.log(named,email,password,req.file);
+        console.log(req.body);
     if(!named || !email || !password || !req.file){
         res.status(400).json({status:false,content:"Please enter all the credentials"});
         return;
@@ -63,7 +64,7 @@ const signup = async(req,res)=>{
     const localpath = req.file.path;
     
     const cres = await uploadOnCloudinary(localpath);
-    const user = new User({name:named,username:email,password:password2,avatar:cres.url});
+    const user = new User({name:named.toUpperCase(),username:email,password:password2,avatar:cres.url});
     user.save();
     res.status(201).json({status:true,user:user});
     } catch (error) {

@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 const schema = new Schema({
     name:{
         type: String,
+        uppercase: true,
         required: true
     },
     username:{
