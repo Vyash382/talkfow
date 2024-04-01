@@ -2,6 +2,7 @@ import express from 'express';import { login,signup } from '../controllers/user.
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { User } from '../models/user.model.js';
 import { upload } from '../middlewares/multur.middleware.js';
+import { Request } from '../models/request.model.js';
 const app = express.Router();
 app.use(express.json());
 app.post('/login',login);
@@ -27,6 +28,30 @@ app.put('/getUsers', async (req, res) => {
     
     res.status(200).json({ status: true, results: users });
 });
+app.post('/addFriend',verifyJWT,async(req,res)=>{
+    try {
+        const sender = await User.findById(req.user._id);
+    const {receiver} = req.body;
+   const previous_requests = await Request.find({
+        $and: [
+          { $or: [{ sender: sender._id }, { receiver: sender._id }] }, 
+          { $or: [{ sender: receiver }, { receiver: receiver }] }, 
+          { status: { $in: ["pending", "accepted"] } }
+        ]
+      });
+      console.log(previous_requests);
+      if(previous_requests.length !== 0){
+        res.status(400).json({status:false,content:'Friend Request sent earlier'});
+        return;
+      }
+    const requ = new Request({status:'pending',sender:sender._id,receiver:receiver});
+    requ.save();
+    res.status(200).json({status:true,requ});
+    } catch (error) {
+        res.status(400).json({status:false,content:'Internal Server Error'});
+    }
+    
+})
 
 
 export default app;

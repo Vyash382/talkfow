@@ -10,7 +10,7 @@ const request = new Schema({
         ref:"User"
     },
     receiver:{
-        types:Types.ObjectId,
+        type:Types.ObjectId,
         ref:"User"
     }
 },{timestamps:true});
