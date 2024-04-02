@@ -30,7 +30,7 @@ const Myself = () => {
   return (
     <>
       <h1 style={{color:"#1976d2", margin: '0'}}>Your Id</h1>
-      <img src={userData.avatar} style={{height: '50%', width: '90%', borderRadius: '500px', objectFit: 'cover'}} alt="" /> 
+      <img src={userData.avatar} style={{height: '50%', width: '90%', borderRadius: '50%', objectFit: 'cover'}} alt="" /> 
       <h2 style={{color:"#1976d2", margin: '0'}}>{userData.name}</h2>
       <h2 style={{color:"#1976d2", margin: '0'}}>{userData.username}</h2>
     </>

@@ -50,6 +50,26 @@ app.post('/addFriend',verifyJWT,async(req,res)=>{
     } catch (error) {
         res.status(400).json({status:false,content:'Internal Server Error'});
     }
+});
+app.post('/requeststatus',verifyJWT,async(req,res)=>{
+    try {
+        const sender = await User.findById(req.user._id);
+    const {receiver} = req.body;
+    const previous_requests = await Request.find({
+        $and: [
+          { $or: [{ sender: sender._id }, { receiver: sender._id }] }, 
+          { $or: [{ sender: receiver }, { receiver: receiver }] }, 
+          { status: { $in: ["pending", "accepted","rejected"] } }
+        ]
+    });
+    if(previous_requests.length == 0){
+        res.status(200).json({status:true,content:'rejected'});
+        return;
+    }
+    res.status(200).json({status:true,content:previous_requests[0].status});
+    } catch (error) {
+        res.status(500).json({status:false,content:"Internal server error"});
+    }
     
 })
 
