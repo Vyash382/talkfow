@@ -1,19 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
+import { useEffect } from 'react';
 
 
 const Chatlist = () => {
   const Navigate = useNavigate();
-  const defaultProfilePicture =
-    'https://th.bing.com/th/id/OIP.47he9BjOXlu02-_mF3NhmwHaHa?rs=1&pid=ImgDetMain';
-  const obj = Array.from({ length: 30 }, (_, index) => ({
-    id: (index + 4).toString(),
-    'Profile Picture': defaultProfilePicture,
-    name: `User ${index + 2}`,
-    last_mesg: 'Random message',
-  }));
+  const [obj,setObj] = useState([]);
+  useEffect(()=>{
+    const fn = async()=>{
+      const response = await fetch('http://localhost:3000/user/friends', {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include'
+    });
+    const json = await response.json();
+    setObj(json);
+    }
+    setInterval(()=>{
+      fn();
+    },1000)
+  },[])
 
   const [selectedChat, setSelectedChat] = useState(null);
 
@@ -28,14 +37,18 @@ const Chatlist = () => {
       
       {obj.map((element, index) => (
         <div
-          key={index}
+          key={element.id}
           style={{
             width: '100%',
             height: '7%',
-            backgroundColor: selectedChat === element.id ? '#1976d2' : '#F0FFFF',
-            color: selectedChat === element.id ? 'white' : 'black',
+            backgroundColor: 
+            
+            selectedChat === element.id ? '#1976d2' : '#F0FFFF',           
+           color: selectedChat === element.id ? 'white' : 'black',
             display: 'flex',
-            position: 'relative',
+            // alignItems : 'center',
+            justifyContent:'space-between',
+            // position: 'relative',
             transition: 'background-color 0.3s',
             
           }}
@@ -43,7 +56,7 @@ const Chatlist = () => {
         >
           <img
             style={{ borderRadius: '40px' }}
-            src={element['Profile Picture']}
+            src={element.avatar}
             alt=""
           />
           <div>

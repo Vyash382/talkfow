@@ -64,7 +64,7 @@ const AddGroup = (props) => {
   };
 
   return (
-    <div style={{ height: "100px", width: "250px", position: "fixed", zIndex: "12" }}>
+    
       <Dialog open={props.msg} onClose={handleClose} maxWidth="xs" fullWidth>
         <DialogTitle>Create Group</DialogTitle>
         <TextField
@@ -90,7 +90,7 @@ const AddGroup = (props) => {
           <Button variant="contained" color='error' onClick={handleClose}>Cancel</Button>
         </Stack>
       </Dialog>
-    </div>
+    
   );
 };
 

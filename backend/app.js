@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser'
 const app = express();
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin:   [ 'http://localhost:5173', 'http://localhost:5174'], 
   credentials: true
 }));
 const MONGO_URI = 'mongodb://localhost:27017/talkfow';
@@ -19,8 +19,9 @@ const connectToMongo = async () => {
     }
   };
 connectToMongo();
-app.listen(3000,()=>{
-    console.log('Server listening on 3000');
+const port = 3000;
+app.listen(port,()=>{
+    console.log('Server listening on '+port);
 })
 app.use('/user',userRoute);
 

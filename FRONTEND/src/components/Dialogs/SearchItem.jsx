@@ -34,7 +34,8 @@ const SearchItem = (props) => {
   
   }, [clic]);
   const addFriend = async (id) => {
-    const response = await fetch('http://localhost:3000/user/addFriend', {
+    if(vari=='Add'){
+      const response = await fetch('http://localhost:3000/user/addFriend', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,6 +45,20 @@ const SearchItem = (props) => {
     });
     const json = await response.json();
     setClic(clic+1);
+    return;
+    };
+    if(vari=='Unsend' || vari=='Unfriend'){
+      const response = await fetch('http://localhost:3000/user/unsend', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ receiver: id }),
+      credentials: 'include'
+    });
+    const json = await response.json();
+    setClic(clic+1);
+    }
   }
 
   return (
