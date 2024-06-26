@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import userRoute from './routes/user.js';
+import chatRoute from './routes/chat.js';
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 const app = express();
@@ -24,7 +25,7 @@ app.listen(port,()=>{
     console.log('Server listening on '+port);
 })
 app.use('/user',userRoute);
-
+app.use('/chat',chatRoute);
 app.get('/',(req,res)=>{
     res.json({"message":"Hello"});
 })

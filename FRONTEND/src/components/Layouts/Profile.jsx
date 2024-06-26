@@ -27,7 +27,7 @@ const Profile = (props) => {
         }}
       >
         <Myself />
-        <Button variant='contained' color='error'>
+        <Button variant='contained' color='error' >
           Log Out
         </Button>
       </div>

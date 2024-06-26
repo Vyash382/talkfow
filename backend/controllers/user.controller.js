@@ -34,6 +34,7 @@ const login = async(req,res)=>{
     const loggedInUser = await User.findById(user._id).select("-password");
     const accesstoken = await generateAccessToken(user._id);
     const options = {
+        maxAge: 15*24*60*60*1000,
         httpOnly: false,
         secure: true,
         sameSite: 'None'

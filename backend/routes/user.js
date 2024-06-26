@@ -39,7 +39,7 @@ app.post('/addFriend',verifyJWT,async(req,res)=>{
           { status: { $in: ["pending", "accepted"] } }
         ]
       });
-      console.log(previous_requests);
+    //   console.log(previous_requests);
       if(previous_requests.length !== 0){
         res.status(400).json({status:false,content:'Friend Request sent earlier'});
         return;
@@ -115,10 +115,10 @@ app.put('/accept',verifyJWT,async(req,res)=>{
     const receiver = await User.findById(req.user._id);
     const {sender} = req.body;
     
-    console.log("sender"+sender);
-    console.log("receiver"+receiver._id);
+    // console.log("sender"+sender);
+    // console.log("receiver"+receiver._id);
     const arr = await Request.find({ receiver: receiver._id, sender: sender,status:'pending'});
-    console.log(arr);
+    // console.log(arr);
     
     arr[0].status='accepted';
     arr[0].save();
@@ -165,6 +165,20 @@ app.get('/friends',verifyJWT,async(req,res)=>{
         }
     
       res.status(200).send(ress);
+})
+app.get('/logout',(req,res)=>{
+    try{
+    const options = {
+        maxAge: 0,
+        httpOnly: false,
+        secure: true,
+        sameSite: 'None'
+    }
+    res.status(400).cookie("accessToken","",options).json({status:true,message:"User logged Out Successsfully"});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({status:false,content:"Internal server error"});
+    }
 })
 
 
