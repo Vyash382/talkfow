@@ -1,4 +1,4 @@
-const emitEvent= (req,event,data,users)=>{
+const emitEvent= (req,event,users,data)=>{
     console.log("illl");
 }
 export {emitEvent};

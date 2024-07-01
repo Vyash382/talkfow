@@ -3,6 +3,8 @@ import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { User } from '../models/user.model.js';
 import { upload } from '../middlewares/multur.middleware.js';
 import { Request } from '../models/request.model.js';
+import { Chat } from '../models/chat.model.js';
+import { emitEvent } from '../utility/utils.js';
 const app = express.Router();
 app.use(express.json());
 app.post('/login',login);
@@ -11,23 +13,31 @@ app.get('/getUserDetails',verifyJWT,async(req,res)=>{
     const user =await User.findById(req.user._id);
     res.status(200).json({name:user.name,username:user.username,avatar:user.avatar});
 });
-app.put('/getUsers', async (req, res) => {
+app.put('/getUsers', verifyJWT ,async (req, res) => {
     const { name, username } = req.body;
     if (!name && !username) {
         res.status(400).json({ status: false, content: "Please enter a value" });
         return;
     }
     
-    
+    const excludeId = req.user._id; 
     const users = await User.find({
-        $or: [
-            { username: username },
-            { name: { $regex: new RegExp('^' + name + '$', "i") } } 
+        $and: [
+            {
+                _id: { $ne: excludeId }
+            },
+            {
+                $or: [
+                    { username: username },
+                    { name: { $regex: new RegExp('^' + name + '$', "i") } } 
+                ]
+            }
         ]
     }).select("-password");
     
     res.status(200).json({ status: true, results: users });
 });
+
 app.post('/addFriend',verifyJWT,async(req,res)=>{
     try {
         const sender = await User.findById(req.user._id);
@@ -119,7 +129,29 @@ app.put('/accept',verifyJWT,async(req,res)=>{
     // console.log("receiver"+receiver._id);
     const arr = await Request.find({ receiver: receiver._id, sender: sender,status:'pending'});
     // console.log(arr);
-    
+    const userId1 = req.user._id;; // Replace with your first user ID
+    const userId2 = sender; // Replace with your second user ID
+
+    const chat = await Chat.findOne({
+        $and: [
+            { groupchat: false }, // Ensure groupChat is false
+            {
+                members: {
+                    $all: [
+                        { $elemMatch: { $eq: userId1 } },
+                        { $elemMatch: { $eq: userId2 } }
+                    ]
+                }   
+            }
+        ]
+    });
+    const mem =[userId1,userId2];
+    if(!chat){
+        
+        const chat = new Chat({name:"BLC",groupchat:false,creator:userId1,members:mem});
+        chat.save();
+    }
+    emitEvent(req,'REFRESH_CHATS',mem);
     arr[0].status='accepted';
     arr[0].save();
     res.send(arr[0]);

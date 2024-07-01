@@ -4,7 +4,11 @@ import userRoute from './routes/user.js';
 import chatRoute from './routes/chat.js';
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import { Server } from "socket.io";
+import { createServer } from 'http'; 
 const app = express();
+const server = createServer(app);
+const io = new Server(server,{});
 app.use(cookieParser());
 app.use(cors({
   origin:   [ 'http://localhost:5173', 'http://localhost:5174'], 
@@ -21,11 +25,21 @@ const connectToMongo = async () => {
   };
 connectToMongo();
 const port = 3000;
-app.listen(port,()=>{
-    console.log('Server listening on '+port);
-})
+
 app.use('/user',userRoute);
 app.use('/chat',chatRoute);
 app.get('/',(req,res)=>{
     res.json({"message":"Hello"});
+})
+io.on("connection", (socket)=>{
+  console.log("a user connected", socket.id);
+  socket.on("disconnect",()=>{
+    console.log('Disconnected');
+  });
+  socket.on("NEW_MESSAGE",(data)=>{
+    console.log("New Message",data);
+  })
+})
+server.listen(port,()=>{
+  console.log('Server listening on '+port);
 })
