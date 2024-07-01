@@ -15,6 +15,7 @@ const schema = new Schema({
     password:{
         type:String,
         required:true,
+        select:false;
     },
     avatar:{
        type:String,
@@ -26,6 +27,7 @@ const schema = new Schema({
 });
 export const User = model("User",schema);
 schema.pre("save",async function(next){
+    if(!this.isModified("password")) next();
     this.password = await bcrypt.hash(this.password,10);
     next();
 })
