@@ -19,9 +19,7 @@ const Chatlist = () => {
     const json = await response.json();
     setObj(json);
     }
-    setInterval(()=>{
-      fn();
-    },1000)
+    fn();
   },[])
 
   const [selectedChat, setSelectedChat] = useState(null);

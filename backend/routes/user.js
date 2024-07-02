@@ -151,6 +151,7 @@ app.put('/accept',verifyJWT,async(req,res)=>{
         const chat = new Chat({name:"BLC",groupchat:false,creator:userId1,members:mem});
         chat.save();
     }
+    
     emitEvent(req,'REFRESH_CHATS',mem);
     arr[0].status='accepted';
     arr[0].save();
@@ -206,7 +207,7 @@ app.get('/logout',(req,res)=>{
         secure: true,
         sameSite: 'None'
     }
-    res.status(400).cookie("accessToken","",options).json({status:true,message:"User logged Out Successsfully"});
+    res.status(200).cookie("accessToken","",options).json({status:true,message:"User logged Out Successsfully"});
     } catch (error) {
         console.log(error);
         res.status(500).json({status:false,content:"Internal server error"});

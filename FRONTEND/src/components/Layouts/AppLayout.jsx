@@ -5,9 +5,10 @@ const AppLayout = () =>(WrappedComponent)=>{
     
      
     return(props) =>{
+        
         return (
             <div>
-            <Header />
+            <Header  />
             <div 
                 style={{
                     height:'92vh',

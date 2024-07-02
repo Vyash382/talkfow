@@ -8,6 +8,7 @@ import AddGroup from '../Dialogs/AddGroup';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Profile from './Profile';
 const Header = () => {
+    
     const [isSearch, setIsSearch] = useState(false);
     const [isNotification, setIsNotification] = useState(false);
     const [isNewGroup, setIsNewGroup] = useState(false);
@@ -76,7 +77,7 @@ const Header = () => {
             {isSearch && <Search ss={setIsSearch} />}
             <Notifications msg={isNotification} msg2={setIsNotification} />
              <AddGroup msg={isNewGroup} msg2={setIsNewGroup} />
-             <Profile msg={profile} />
+             <Profile msg={profile}  />
         </>
     );
 };

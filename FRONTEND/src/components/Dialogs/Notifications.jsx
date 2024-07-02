@@ -19,7 +19,7 @@ const Notifications = (props) => {
       setNotf(json);
     };
     func();
-  },[ue])
+  },[])
   const accept = async(id)=>{
     
     const response = await fetch(`http://localhost:3000/user/accept`, {
