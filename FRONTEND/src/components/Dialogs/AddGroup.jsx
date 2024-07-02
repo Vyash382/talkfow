@@ -1,51 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, Stack, Button, TextField } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 import './AddGroup.css'; // Import your CSS file
-
+import axios from 'axios';
 const AddGroup = (props) => {
-  const users = [{
-    "Sender":{
-      "avatar":"https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain",
-      "name":"Yash Sinha"
-    },
-    "_id":"6"
-  },{
-    "Sender":{
-      "avatar":"https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain",
-      "name":"Yash Sinha"
-    },
-    "_id":"5"
-  },{
-    "Sender":{
-      "avatar":"https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain",
-      "name":"Yash Sinha"
-    },
-    "_id":"4"
-  },
-  {
-    "Sender":{
-      "avatar":"https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain",
-      "name":"Yash Sinha"
-    },
-    "_id":"3"
-  },{
-    "Sender":{
-      "avatar":"https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain",
-      "name":"Yash Sinha"
-    },
-    "_id":"2"
-  },{
-    "Sender":{
-      "avatar":"https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain",
-      "name":" Yash Sinha "
-    },
-    "_id":"1"
-  }];
+  const [users,setUsers] = useState([]);
+  useEffect(()=>{
+    const fn = async()=>{
+      const response = await fetch('http://localhost:3000/user/friends', {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include'
+    });
+    const json = await response.json();
+    // console.log("-------");
+    // console.log(json);
+    // console.log("-------");
+    setUsers(json);
+    }
+    fn();
+  },[])
   const [groupMember, setGroupMember] = useState([]);
   const [groupName, setGroupName] = useState("");
 
   const addHandler = (id) => {
+    console.log(id);
+    console.log(groupMember);
     if (!groupMember.includes(id)) {
       const newArr = [...groupMember, id];
       setGroupMember(newArr);
@@ -59,10 +41,22 @@ const AddGroup = (props) => {
     return groupMember.includes(id);
   };
 
-  const handleClose = () => {
+  const handleClose = async() => {
+    const formData = {
+      name : groupName,
+      members : groupMember
+    };
+    const res = await axios.post('http://localhost:3000/chat/newGroupChat', formData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
     props.msg2(false);
   };
-
+  const close = ()=>{
+    props.msg2(false);
+  }
   return (
     
       <Dialog open={props.msg} onClose={handleClose} maxWidth="xs" fullWidth>
@@ -80,14 +74,14 @@ const AddGroup = (props) => {
             <p>Add some friends first</p>
           ) : (
             users.map((notification) => (
-              <div key={notification._id} className={`user-item ${isSelected(notification._id) ? 'selected' : ''}`} onClick={() => addHandler(notification._id)}>
-                <img src={notification.Sender.avatar} alt={notification.Sender.name} style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '10px' }} />
-                <div>{notification.Sender.name} </div>
+              <div key={notification.id} className={`user-item ${isSelected(notification.id) ? 'selected' : ''}`} onClick={() => addHandler(notification.id)}>
+                <img src={notification.avatar} alt={notification.name} style={{ width: '50px', height: '50px', borderRadius: '50%', marginRight: '10px' }} />
+                <div>{notification.name} </div>
               </div>
             ))
           )}
           <Button variant="contained"  onClick={handleClose}>Create Group</Button>
-          <Button variant="contained" color='error' onClick={handleClose}>Cancel</Button>
+          <Button variant="contained" color='error' onClick={close}>Cancel</Button>
         </Stack>
       </Dialog>
     

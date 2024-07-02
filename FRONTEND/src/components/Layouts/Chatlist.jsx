@@ -9,7 +9,7 @@ const Chatlist = () => {
   const [obj,setObj] = useState([]);
   useEffect(()=>{
     const fn = async()=>{
-      const response = await fetch('http://localhost:3000/user/friends', {
+      const response = await fetch('http://localhost:3000/chat/my', {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -17,7 +17,8 @@ const Chatlist = () => {
       credentials: 'include'
     });
     const json = await response.json();
-    setObj(json);
+    console.log(json);
+    setObj(json.arr);
     }
     fn();
   },[])

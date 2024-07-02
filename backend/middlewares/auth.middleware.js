@@ -14,7 +14,37 @@ const verifyJWT=async(req,res,next)=>{
         return;
      }
      req.user =user;
-     console.log(user);
+    //  console.log(user);
      next();
 }
-export {verifyJWT};
+;
+const socketAuthenticator = async (err, socket, next) => {
+    try {
+      if (err) return next(err);
+        console.log(socket.req);
+        
+      const authToken = socket.request.cookies["accessToken"];
+  
+      if (!authToken) {
+        console.log("Authentication token not found");
+        return next(new Error("Authentication error"));
+      }
+  
+      const decodedData = jwt.verify(authToken,"YUAFGBbIUBHafbaugBIUGUBghuSGgbuibgubguyba JGHE78453BHA^&TgvAytT78GABYUUYETGYWTBUWYF" );
+  
+      const user = await User.findById(decodedData._id);
+  
+      if (!user) {
+        console.log("User not found");
+        return next(new Error("Authentication error"));
+      }
+  
+      socket.user = user;
+  
+      return next();
+    } catch (error) {
+      console.log("Authentication error", error);
+      return next(new Error("Authentication error"));
+    }
+  };
+export {verifyJWT,socketAuthenticator};

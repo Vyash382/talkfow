@@ -5,6 +5,7 @@ import { Slide } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { UserNotExists } from '../../redux/reducers/auth';
+import axios from 'axios';
 const Profile = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();

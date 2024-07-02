@@ -11,6 +11,7 @@ import GroupItem from './pages/GroupItem.jsx';
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
 import { userExists, UserNotExists } from "./redux/reducers/auth";
+import { SocketProvider } from './socket.jsx';
 const App = () => {
   const { user, loader } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const App = () => {
   return (
     <>
       <BrowserRouter>
+      <SocketProvider>
         <Routes>
           <Route path='/' element={<ProtectRoute user={user} redirect='/login'><Home  /></ProtectRoute>}></Route>
           <Route path='/login' element={<ProtectRoute user={!user} redirect='/'><Login /></ProtectRoute>}></Route>
@@ -51,6 +53,7 @@ const App = () => {
           <Route path='/group/:groupID' element={<ProtectRoute user={user} redirect='/login'><GroupItem /></ProtectRoute>}></Route>
           <Route path='*' element={<Notfound />}></Route>
         </Routes>
+        </SocketProvider>
       </BrowserRouter>
     </>
   );

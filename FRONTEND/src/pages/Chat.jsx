@@ -1,31 +1,74 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import AppLayout from '../components/Layouts/AppLayout';
 import { IconButton, Stack, TextField } from '@mui/material';
 import { AttachFile, Send } from '@mui/icons-material';
 import Attachh from '../components/Dialogs/Attachh';
-
-const Chat = () => {
-  const [user, setUser] = useState(1);
+import axios from 'axios';
+import { getSocket } from '../socket';
+import { useParams } from 'react-router-dom';
+const Chat = ({user}) => {
+  const params = useParams();
+  
+  const chatId = params.chatID;
+        
+  const socket = getSocket();
   const [dbx, setDbx] = useState(false);
   const [messages, setMessages] = useState([]);
   const containerRef = useRef(null);
   const [msg, setMsg] = useState("");
+  const [members,setMembers] = useState([]);
+  const newMessages = useCallback((data)=>{
+    console.log(data);
+  },[]);
+  useEffect(()=>{
+    const fetchChatMembers = async (chatId) => {
+      try {
+        const formData = {
+          chatId: chatId
+        };
+        
+        const response = await fetch('http://localhost:3000/chat/members', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
 
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const res = await response.json();
+        const yt = res.members;
+        console.log(yt);
+        // const arr = await res.json();
+        setMembers(yt);
+        // console.log(members);
+      } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+      }
+    };
+    fetchChatMembers(chatId);
+  },[]);
+  useEffect(() => {
+   socket.on('NEW_MESSAGE',newMessages);
+    return ()=>{
+      socket.off('NEW_MESSAGES',newMessages);
+    }
+  }, []);
   const dbxHandler = () => {
     setDbx(!dbx);
     console.log(dbx);
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); 
-    const randomSenderId = Math.random() < 0.5 ? 1 : 2;
-  const obj = { "sender._id": randomSenderId, "content": msg };
-    const updatedMessages = [...messages, obj];
-    setMessages(updatedMessages);
-    setMsg(""); // Clear input field after submission
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
+    e.preventDefault();
+    
+    // if (!messages.trim()) return;
+    socket.emit('NEW_MESSAGE', { chatId, members, message:msg });
+    setMsg("");
   };
 
   return (

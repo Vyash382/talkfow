@@ -10,11 +10,15 @@ import dotenv from 'dotenv';
 import {v4 as uuidv4} from 'uuid';
 import { getSockets } from "./utility/utils.js";
 import { Message } from "./models/message.model.js";
+import { socketAuthenticator } from "./middlewares/auth.middleware.js";
 dotenv.config();
 const userSocketIds = new Map();
 const app = express();
 const server = createServer(app);
-const io = new Server(server,{});
+const io = new Server(server,{ cors : {
+  origin:   [ 'http://localhost:5173', 'http://localhost:5174'], 
+  credentials: true
+}});
 app.use(cookieParser());
 app.use(cors({
   origin:   [ 'http://localhost:5173', 'http://localhost:5174'], 
@@ -38,18 +42,24 @@ app.get('/',(req,res)=>{
     res.json({"message":"Hello"});
 });
 
-io.use((socket,next)=>{
-
-})
+io.use((socket, next) => {
+  // console.log(socket);
+  cookieParser()(
+    socket.request,
+    socket.request.res,
+    async (err) => await socketAuthenticator(err, socket, next)
+  );
+});
 
 io.on("connection", (socket)=>{
-  const user = {
-    _id: "asada",
-    name:"ryu",
-  }
-
-  userSocketIds[user._id]=socket.id;
-  console.log(userSocketIds);
+  const user = socket.user;
+  // console.log('-----');
+  
+  // console.log(user);
+  // console.log('-----');
+  
+  userSocketIds.set(user._id.toString(), socket.id);
+  // console.log(userSocketIds);
   
   console.log("a user connected", socket.id);
   socket.on("disconnect",()=>{
@@ -72,7 +82,9 @@ io.on("connection", (socket)=>{
       sender: user._id,
       chat: chatId,
     }
+    // console.log(message);
     const membersSockets = getSockets(members);
+    membersSockets.push(userSocketIds.get(user._id));
     io.to(membersSockets).emit('NEW_MESSAGE',{
       chatId,
       message: messageForRealTime

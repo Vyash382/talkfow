@@ -1,11 +1,17 @@
 import React, { useState } from 'react'
 import Header from './Header';
 import Chatlist from './Chatlist';
+import { getSocket } from '../../socket';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 const AppLayout = () =>(WrappedComponent)=>{
     
      
     return(props) =>{
         
+        const { user } = useSelector((state) => state.auth);
+        const socket = getSocket();
+        console.log(socket.id);
         return (
             <div>
             <Header  />
@@ -43,7 +49,7 @@ const AppLayout = () =>(WrappedComponent)=>{
                     backgroundColor:'white'
                     }}
                 >
-                    <WrappedComponent {...props} />
+                    <WrappedComponent {...props}  user={user} />
                 </div>
                 
             </div>

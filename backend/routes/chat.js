@@ -4,6 +4,7 @@ import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { emitEvent } from '../utility/utils.js';
 import { User } from '../models/user.model.js';
 import { Message } from '../models/message.model.js';
+// import axios from  'axios';
 const app = express.Router();
 app.use(express.json());
 
@@ -28,7 +29,48 @@ app.get('/my', verifyJWT, async (req, res) => {
     try {
         const id = req.user._id;
         const my_chats = await Chat.find({ members: id });
-        res.status(200).json({ success: true, my_chats });
+        const arr =[];
+        for (let index = 0; index < my_chats.length; index++) {
+            const element = my_chats[index];
+            // console.log(element);
+            if(element.groupchat=='true'){
+                const obj1 = {
+                    name : element.name,
+                    avatar : 'https://th.bing.com/th/id/OIP.kg6yJds7NHwm0Zz1AXOyBgHaEK?w=310&h=180&c=7&r=0&o=5&dpr=1.6&pid=1.7',
+                    id: element._id
+                }
+                arr.push(obj1);
+            }
+            else{
+                
+                if(element.members[0]==id){
+                    console.log(id,element.members[0]);
+                    if(element.members[0]!=id){
+                    const user = await User.findById(element.members[0]);
+                    const obj1 = {
+                        name : user.name,
+                        avatar : user.avatar,
+                        id: element._id
+                    }
+                    arr.push(obj1);
+                }
+                }
+                else{
+                    console.log(id,element.members[1]);
+                    if(element.members[1]!=id){
+                    const user = await User.findById(element.members[1]);
+                    const obj1 = {
+                        name : user.name,
+                        avatar : user.avatar,
+                        id: element._id
+                    }
+                    arr.push(obj1);
+                }
+                }
+            }
+            
+        }
+        res.status(200).json({ success: true, arr });
     } catch (error) {
         res.status(400).json({ success: false, error });
     }
@@ -179,6 +221,27 @@ app.get('/myMessages:id',verifyJWT,async(req,res)=>{
       messages: messages.reverse(),
       totalPages,
     });
+})
+app.post('/members',verifyJWT,async(req,res)=>{
+    try {
+       
+        const {chatId} = req.body;
+        
+        const myid = req.user._id.toString();
+        const members=[];
+        const chat = await Chat.findById(chatId);
+        const mem2 = chat.members;
+        for (let index = 0; index < mem2.length; index++) {
+            const element = mem2[index];
+            if(element!=myid){
+                members.push(element);
+            }
+        }
+        res.status(200).json({success:true, members});
+    } catch (error) {
+        console.log(error);
+        res.status(404).json({success:false, message:"Some Error Occured"});
+    }
 })
 
 export default app;
