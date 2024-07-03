@@ -13,6 +13,11 @@ app.get('/getUserDetails',verifyJWT,async(req,res)=>{
     const user =await User.findById(req.user._id);
     res.status(200).json({name:user.name,username:user.username,avatar:user.avatar});
 });
+app.get('/getMy',verifyJWT,async(req,res)=>{
+    
+    const id = req.user._id.toString();
+    res.status(200).json({id:id });
+});
 app.put('/getUsers', verifyJWT ,async (req, res) => {
     const { name, username } = req.body;
     if (!name && !username) {

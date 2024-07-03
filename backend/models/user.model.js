@@ -22,8 +22,7 @@ const schema = new Schema({
         type: String,
         required: true
     }
-},
-{
+}, {
     timestamps: true
 });
 
@@ -38,7 +37,7 @@ schema.methods.comparePassword = async function(password) {
 };
 
 schema.methods.generateAccessToken = async function() {
-    return await jwt.sign(
+    return jwt.sign(
         {
             _id: this._id
         },

@@ -3,36 +3,94 @@ import AppLayout from '../components/Layouts/AppLayout';
 import { IconButton, Stack, TextField } from '@mui/material';
 import { AttachFile, Send } from '@mui/icons-material';
 import Attachh from '../components/Dialogs/Attachh';
-import axios from 'axios';
 import { getSocket } from '../socket';
 import { useParams } from 'react-router-dom';
-const Chat = ({user}) => {
+
+const Chat = () => {
   const params = useParams();
-  
   const chatId = params.chatID;
-        
-  const socket = getSocket();
-  const [dbx, setDbx] = useState(false);
   const [messages, setMessages] = useState([]);
-  const containerRef = useRef(null);
+  const [members, setMembers] = useState([]);
+  const [page, setPage] = useState(1);
   const [msg, setMsg] = useState("");
-  const [members,setMembers] = useState([]);
-  const newMessages = useCallback((data)=>{
-    console.log(data);
-  },[]);
-  useEffect(()=>{
+  const [dbx, setDbx] = useState(false);
+  const [user,setUser] = useState('sdf');
+  
+  const socket = getSocket();
+  const containerRef = useRef(null);
+
+  const newMessages = useCallback((data) => {
+    console.log();
+    const obj = {
+      'sender._id' : data.message.sender._id,
+      'avatar' : data.message.sender.avatar,
+      'content' : data.message.content
+    }
+    setMessages(prevMessages => [...prevMessages, obj]);
+    
+  }, []);
+
+  useEffect(() => {
+    const misc = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/user/getMy`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        setUser(data.id);
+        // console.log('Response data:', data.id);
+      } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+      }
+    };
+
+    const preMsg = async (chatId, page) => {
+      try {
+        const response = await fetch(`http://localhost:3000/chat/myMessages/${chatId}?page=${page}`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const yy = [];
+        for (let index = 0; index < data.messages.length; index++) {
+          const element = data.messages[index];
+          
+          const obj = {
+            'sender._id': element.sender._id,
+            'content': element.content,
+            'avatar': element.sender.avatar
+          };
+          yy.push(obj);
+        }
+
+        setMessages(prevMessages => [...prevMessages, ...yy]);
+        setPage(page + 1);
+      } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+      }
+    };
+
     const fetchChatMembers = async (chatId) => {
       try {
-        const formData = {
-          chatId: chatId
-        };
+        const formData = { chatId: chatId };
         
         const response = await fetch('http://localhost:3000/chat/members', {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
 
@@ -41,23 +99,30 @@ const Chat = ({user}) => {
         }
 
         const res = await response.json();
-        const yt = res.members;
-        console.log(yt);
-        // const arr = await res.json();
-        setMembers(yt);
-        // console.log(members);
+        setMembers(res.members);
       } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
       }
     };
-    fetchChatMembers(chatId);
-  },[]);
-  useEffect(() => {
-   socket.on('NEW_MESSAGE',newMessages);
-    return ()=>{
-      socket.off('NEW_MESSAGES',newMessages);
+
+    // Await the misc function
+    (async () => {
+      await misc();
+    })();
+
+    if (chatId) {
+      preMsg(chatId, page);
+      fetchChatMembers(chatId);
     }
   }, []);
+
+  useEffect(() => {
+    socket.on('NEW_MESSAGE', newMessages);
+    return () => {
+      socket.off('NEW_MESSAGE', newMessages);
+    };
+  }, [newMessages, socket]);
+
   const dbxHandler = () => {
     setDbx(!dbx);
     console.log(dbx);
@@ -65,9 +130,8 @@ const Chat = ({user}) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // if (!messages.trim()) return;
-    socket.emit('NEW_MESSAGE', { chatId, members, message:msg });
+    if (!msg.trim()) return;
+    socket.emit('NEW_MESSAGE', { chatId, members, message: msg });
     setMsg("");
   };
 
@@ -86,9 +150,9 @@ const Chat = ({user}) => {
         }}
       >
         {messages.map((Element, index) => (
-          Element['sender._id'] === user ? (
-            <div style={{ display: "flex" }}>
-              <img src="https://i.pinimg.com/originals/4f/5a/3d/4f5a3d7be9361605886989491b1c69d5.jpg" alt="Avatar" style={{
+          Element['sender._id'] != user ? (
+            <div key={index} style={{ display: "flex" }}>
+              <img src={Element.avatar} alt="Avatar" style={{
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
@@ -99,11 +163,11 @@ const Chat = ({user}) => {
               </div>
             </div>
           ) : (
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div key={index} style={{ display: "flex", gap: "10px" }}>
               <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", padding: "7px", borderRadius: "5px", backgroundColor: "bisque", minHeight: "50px", height: "auto", width: "auto" }}>
                 {Element.content}
               </div>
-              <img src="https://th.bing.com/th/id/OIP.0l7k5zqRUVQ5Yq9eTpW2LgHaLJ?rs=1&pid=ImgDetMain" alt="Avatar" style={{
+              <img src={Element.avatar} alt="Avatar" style={{
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',

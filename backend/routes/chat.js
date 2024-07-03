@@ -188,22 +188,27 @@ app.delete('/chat/:id', verifyJWT, async (req, res) => {
         return res.status(500).json({ success: false, error });
     }
 });
-app.get('/myMessages:id',verifyJWT,async(req,res)=>{
+app.get('/myMessages/:id',verifyJWT,async(req,res)=>{
     const chatId = req.params.id;
-    const { page = 1 } = req.query;
-  
+    const { page  } = req.query;
+  console.log(chatId,page);
     const resultPerPage = 20;
     const skip = (page - 1) * resultPerPage;
   
     const chat = await Chat.findById(chatId);
   
-    if (!chat) return next(new ErrorHandler("Chat not found", 404));
-  
-    if (!chat.members.includes(req.user.toString()))
-      return next(
-        new ErrorHandler("You are not allowed to access this chat", 403)
-      );
-  
+        
+    
+    if (!chat) {
+        
+        res.status(400).json({success:false, message:"Chat not found"});
+        return;
+    } 
+    if (!chat.members.includes(req.user._id.toString())){
+        console.log('----------');
+        res.status(400).json({success:false, message:"Not authorised"});
+        return;
+    }
     const [messages, totalMessagesCount] = await Promise.all([
       Message.find({ chat: chatId })
         .sort({ createdAt: -1 })
@@ -215,10 +220,27 @@ app.get('/myMessages:id',verifyJWT,async(req,res)=>{
     ]);
   
     const totalPages = Math.ceil(totalMessagesCount / resultPerPage) || 0;
-  
+    const msg2 = messages.reverse();
+    const ret = [];
+    for (let index = 0; index < msg2.length; index++) {
+        const element = msg2[index];
+        const user = await User.findById(element.sender);
+        const avatar = user.avatar;
+        
+        // console.log(element.sender._id.toHexString());
+        // console.log('dsfd');
+        const obj = {
+            sender:{
+                _id: element.sender._id.toHexString(),
+                avatar: avatar
+            },
+            content : element.content
+        }
+        ret.push(obj);
+    }
     return res.status(200).json({
       success: true,
-      messages: messages.reverse(),
+      messages: ret,
       totalPages,
     });
 })
@@ -233,15 +255,19 @@ app.post('/members',verifyJWT,async(req,res)=>{
         const mem2 = chat.members;
         for (let index = 0; index < mem2.length; index++) {
             const element = mem2[index];
-            if(element!=myid){
+            // if(element!=myid){
                 members.push(element);
-            }
+            // }
         }
         res.status(200).json({success:true, members});
     } catch (error) {
         console.log(error);
         res.status(404).json({success:false, message:"Some Error Occured"});
     }
-})
+});
+// app.get('/misc/:chatId',verifyJWT,async(req,res)=>{
+//     const user = req.user._id.toString();
+//     const chatId = req.params.
+// })
 
 export default app;

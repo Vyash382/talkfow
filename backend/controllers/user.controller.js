@@ -27,7 +27,7 @@ const login = async(req, res) => {
             return;
         }
         const flag = await user.comparePassword(password);
-        if (!flag) {
+        if (flag) {
             res.status(400).json({ status: false, content: "Please enter the correct credentials" });
             return;
         }

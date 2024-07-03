@@ -11,6 +11,7 @@ import {v4 as uuidv4} from 'uuid';
 import { getSockets } from "./utility/utils.js";
 import { Message } from "./models/message.model.js";
 import { socketAuthenticator } from "./middlewares/auth.middleware.js";
+import { User } from "./models/user.model.js";
 dotenv.config();
 const userSocketIds = new Map();
 const app = express();
@@ -72,7 +73,8 @@ io.on("connection", (socket)=>{
       _id: uuidv4(),
       sender: {
         _id: user._id,
-        name: user.name
+        name: user.name,
+        avatar: user.avatar
       },
       chat: chatId,
       createdAt: new Date().toISOString()
@@ -82,6 +84,7 @@ io.on("connection", (socket)=>{
       sender: user._id,
       chat: chatId,
     }
+    
     // console.log(message);
     const membersSockets = getSockets(members);
     membersSockets.push(userSocketIds.get(user._id));
