@@ -14,23 +14,30 @@ const Chat = () => {
   const [page, setPage] = useState(1);
   const [msg, setMsg] = useState("");
   const [dbx, setDbx] = useState(false);
-  const [user,setUser] = useState('sdf');
+  const [user, setUser] = useState('');
   
   const socket = getSocket();
   const containerRef = useRef(null);
 
   const newMessages = useCallback((data) => {
-    console.log();
+    console.log(data.chatId+" "+params.chatID);
+    if(params.chatID==data.chatId){
     const obj = {
-      'sender._id' : data.message.sender._id,
-      'avatar' : data.message.sender.avatar,
-      'content' : data.message.content
+      'sender._id': data.message.sender._id,
+      'avatar': data.message.sender.avatar,
+      'content': data.message.content
     }
     setMessages(prevMessages => [...prevMessages, obj]);
-    
-  }, []);
+  }
+  }, [params.chatID]);
 
   useEffect(() => {
+    // setChatId(params.chatID)
+    const resetState = () => {
+      setPage(1);
+      setMessages([]);
+    };
+
     const misc = async () => {
       try {
         const response = await fetch(`http://localhost:3000/user/getMy`, {
@@ -38,22 +45,20 @@ const Chat = () => {
           credentials: 'include'
         });
 
-        console.log('Response status:', response.status);
-
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
         setUser(data.id);
-        // console.log('Response data:', data.id);
       } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
+        console.error('Error fetching user:', error);
       }
     };
 
     const preMsg = async (chatId, page) => {
       try {
+        console.log(chatId + " " + page);
         const response = await fetch(`http://localhost:3000/chat/myMessages/${chatId}?page=${page}`, {
           method: 'GET',
           credentials: 'include'
@@ -64,29 +69,24 @@ const Chat = () => {
         }
 
         const data = await response.json();
-        const yy = [];
-        for (let index = 0; index < data.messages.length; index++) {
-          const element = data.messages[index];
-          
-          const obj = {
-            'sender._id': element.sender._id,
-            'content': element.content,
-            'avatar': element.sender.avatar
-          };
-          yy.push(obj);
-        }
+        console.log(data);
+        const yy = data.messages.map(element => ({
+          'sender._id': element.sender._id,
+          'content': element.content,
+          'avatar': element.sender.avatar
+        }));
 
-        setMessages(prevMessages => [...prevMessages, ...yy]);
-        setPage(page + 1);
+        setMessages(yy);  // Set messages directly without appending
+        setPage(2);       // Set the page to the next one
       } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
+        console.error('Error fetching messages:', error);
       }
     };
 
     const fetchChatMembers = async (chatId) => {
       try {
         const formData = { chatId: chatId };
-        
+
         const response = await fetch('http://localhost:3000/chat/members', {
           method: 'POST',
           credentials: 'include',
@@ -99,33 +99,31 @@ const Chat = () => {
         }
 
         const res = await response.json();
+        console.log(res);
         setMembers(res.members);
       } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
+        console.error('Error fetching chat members:', error);
       }
     };
 
-    // Await the misc function
-    (async () => {
-      await misc();
-    })();
+    resetState();
+    misc();
 
-    if (chatId) {
-      preMsg(chatId, page);
-      fetchChatMembers(chatId);
+    if (params.chatID) {
+      preMsg(params.chatID, 1);
+      fetchChatMembers(params.chatID);
     }
-  }, []);
+  }, [params.chatID]);
 
   useEffect(() => {
     socket.on('NEW_MESSAGE', newMessages);
     return () => {
       socket.off('NEW_MESSAGE', newMessages);
     };
-  }, [newMessages, socket]);
+  }, [newMessages]);
 
   const dbxHandler = () => {
     setDbx(!dbx);
-    console.log(dbx);
   };
 
   const handleSubmit = (e) => {
@@ -150,7 +148,7 @@ const Chat = () => {
         }}
       >
         {messages.map((Element, index) => (
-          Element['sender._id'] != user ? (
+          Element['sender._id'] !== user ? (
             <div key={index} style={{ display: "flex" }}>
               <img src={Element.avatar} alt="Avatar" style={{
                 width: '40px',
