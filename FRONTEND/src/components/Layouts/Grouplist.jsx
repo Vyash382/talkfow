@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Grouplist = () => {
     const navigate = useNavigate();
     const [selectedGroup, setSelectedGroup] = useState(null); 
-    const arr = [];
+    const [arr,setArr] = useState([]);
     const p_pic = "https://th.bing.com/th/id/OIP.y8tWWY6Vh7BX50XtbsIcnwHaFe?rs=1&pid=ImgDetMain";
     
    
-    for (let i = 1; i <= 50; i++) {
-        const randomId = i;
-        const randomName = "Group " + i;
-        
-        arr.push({
-            p_pic: p_pic,
-            _id: randomId,
-            name: randomName
-        });
-    }
+    useEffect(()=>{
+       const funcc = async()=>{
+        const response = await fetch('http://localhost:3000/chat/myGroupChats', {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: 'include'
+          });
+          const json = await response.json();
+          setArr(json);
+        };
+        funcc();
+    })
 
     const handleClick = (id) => {
         setSelectedGroup(id); // Set the selected group ID

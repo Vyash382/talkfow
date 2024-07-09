@@ -11,7 +11,7 @@ const AppLayout = () =>(WrappedComponent)=>{
         
         const { user } = useSelector((state) => state.auth);
         const socket = getSocket();
-        console.log(socket.id);
+        // console.log(socket.id);
         return (
             <div>
             <Header  />

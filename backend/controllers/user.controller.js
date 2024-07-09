@@ -27,7 +27,7 @@ const login = async(req, res) => {
             return;
         }
         const flag = await user.comparePassword(password);
-        if (flag) {
+        if (!flag) {
             res.status(400).json({ status: false, content: "Please enter the correct credentials" });
             return;
         }
@@ -60,6 +60,7 @@ const signup = async(req, res) => {
         }
         const password2 = await bcrypt.hash(password, 10);
         const localpath = req.file.path;
+        console.log('--------------------');
         const cres = await uploadOnCloudinary(localpath);
         const user = new User({ name: named.toUpperCase(), username: email, password: password2, avatar: cres.url });
         await user.save();

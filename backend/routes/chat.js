@@ -27,7 +27,7 @@ app.post('/newGroupChat', verifyJWT, async (req, res) => {
 
 app.get('/my', verifyJWT, async (req, res) => {
     try {
-        const id = req.user._id;
+        const id = req.user._id.toString();
         const my_chats = await Chat.find({ members: id });
         const arr =[];
         for (let index = 0; index < my_chats.length; index++) {
@@ -43,9 +43,9 @@ app.get('/my', verifyJWT, async (req, res) => {
             }
             else{
                 
-                if(element.members[0]==id){
-                    console.log(id,element.members[0]);
-                    if(element.members[0]!=id){
+                if(element.members[0]!=id){
+                    // console.log(id,element.members[0]);
+                    // if(element.members[0]!=id){
                     const user = await User.findById(element.members[0]);
                     const obj1 = {
                         name : user.name,
@@ -53,7 +53,7 @@ app.get('/my', verifyJWT, async (req, res) => {
                         id: element._id
                     }
                     arr.push(obj1);
-                }
+                // }
                 }
                 else{
                     console.log(id,element.members[1]);
@@ -265,9 +265,82 @@ app.post('/members',verifyJWT,async(req,res)=>{
         res.status(404).json({success:false, message:"Some Error Occured"});
     }
 });
-// app.get('/misc/:chatId',verifyJWT,async(req,res)=>{
-//     const user = req.user._id.toString();
-//     const chatId = req.params.
-// })
+app.get('/myGroupChats', verifyJWT, async (req, res) => {
+    try {
+        const userId = req.user._id.toString();
+        const arr = await Chat.find({
+            members: userId,
+            groupchat: true
+        });
+        const groupChats = [];
+        for (let index = 0; index < arr.length; index++) {
+            const element = arr[index];
+            const obj = {
+                p_pic : "https://th.bing.com/th/id/OIP.y8tWWY6Vh7BX50XtbsIcnwHaFe?rs=1&pid=ImgDetMain",
+                _id : element._id,
+                name : element.name
+            }
+            groupChats.push(obj);
+        }
+        res.status(200).json(groupChats);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+app.put('/GroupMembers', verifyJWT, async (req, res) => {
+    try {
+        // console.log('-----');
+        const gid = req.body.id;
+        // console.log(gid);
+        const group = await Chat.findById(gid);
+        const members = group.members;
+        const arr = [];
+        for (let index = 0; index < members.length; index++) {
+            const element = members[index];
+            const user = await User.findById(element);
+            const obj = {
+                Member:{
+                    avatar: user.avatar,
+                    name: user.name
+                },
+                _id:index
+            }
+            arr.push(obj);
+        }
+        res.status(200).json(arr);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+app.put('/GroupName', verifyJWT, async (req, res) => {
+    try {
+        // console.log('-----');
+        const gid = req.body.id;
+        // console.log(gid);
+        const group = await Chat.findById(gid);
+        res.status(200).json({name:group.name});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+app.put('/GroupChange', verifyJWT, async (req, res) => {
+    try {
+        // console.log('-----');
+        const gid = req.body.id;
+        const name = req.body.name;
+
+        // console.log(gid);
+        const group = await Chat.findById(gid);
+        group.name = name;
+        group.save();
+        res.status(200).json({name});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 export default app;
