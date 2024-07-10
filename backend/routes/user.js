@@ -4,8 +4,8 @@ import { User } from '../models/user.model.js';
 import { upload } from '../middlewares/multur.middleware.js';
 import { Request } from '../models/request.model.js';
 import { Chat } from '../models/chat.model.js';
-import { emitEvent } from '../utility/utils.js';
-import mongoose from 'mongoose';
+import { emitEvent, getSockets } from '../utility/utils.js';
+import mongoose, { isObjectIdOrHexString } from 'mongoose';
 const app = express.Router();
 app.use(express.json());
 app.post('/login',login);
@@ -62,6 +62,10 @@ app.post('/addFriend',verifyJWT,async(req,res)=>{
       }
     const requ = new Request({status:'pending',sender:sender._id,receiver:receiver});
     requ.save();
+    const io = req.app.get("io");
+    const members = [receiver];
+    const getM = getSockets(members);
+    io.to(getM).emit('SHOW_DIALOG',{ getM});
     res.status(200).json({status:true,requ});
     } catch (error) {
         res.status(400).json({status:false,content:'Internal Server Error'});
@@ -91,8 +95,7 @@ app.post('/requeststatus',verifyJWT,async(req,res)=>{
 app.post('/unsend',verifyJWT,async(req,res)=>{
     const sender =await User.findById(req.user._id);
     const {receiver} = req.body;
-    console.log(sender._id);
-    console.log(receiver);
+    
     
     const previous_requests = await Request.find({
         $and: [
@@ -108,7 +111,13 @@ app.post('/unsend',verifyJWT,async(req,res)=>{
         return;
     }
     await Request.deleteMany({ _id: { $in: previous_requests.map(request => request._id) } });
-
+    const io = req.app.get("io");
+    const members = [sender._id,receiver];
+    const getM = getSockets(members);
+    const members2 = [receiver];
+    const getM2 = getSockets(members2);
+    io.to(getM).emit('REFETCH_CHATS',{ getM});
+    io.to(getM2).emit('SHOW_DIALOG',{ getM2});
     res.status(200).json({ status: true, content: 'Requests deleted' });
 });
 app.get('/fetchRequests',verifyJWT,async(req,res)=>{
@@ -131,16 +140,16 @@ app.put('/accept',verifyJWT,async(req,res)=>{
     const receiver = await User.findById(req.user._id);
     const {sender} = req.body;
     
-    // console.log("sender"+sender);
-    // console.log("receiver"+receiver._id);
+    
+   
     const arr = await Request.find({ receiver: receiver._id, sender: sender,status:'pending'});
-    // console.log(arr);
+    console.log(arr);
     const userId1 = receiver._id;
     const userId2 = new mongoose.Types.ObjectId(sender);
-    console.log(userId1+"-------------"+userId2);
+    
     const chat = await Chat.findOne({
         $and: [
-            { groupchat: false }, // Ensure groupChat is false
+            { groupchat: false }, 
             {
                 members: {
                     $all: [
@@ -151,16 +160,19 @@ app.put('/accept',verifyJWT,async(req,res)=>{
             }
         ]
     });
+    
     const mem =[userId1,userId2];
-    console.log(chat);
-    console.log('--------');
     if(!chat){
         
         const chat = new Chat({name:"BLC",groupchat:false,creator:userId1,members:mem});
         chat.save();
     }
-    
-    emitEvent(req,'REFRESH_CHATS',mem);
+    const io = req.app.get("io");
+    const members = [userId1,userId2];
+    const getM = getSockets(members);
+    io.to(getM).emit('REFETCH_CHATS',{ getM});
+    io.to(getM).emit('SHOW_DIALOG',{ getM});
+    console.log(arr);
     arr[0].status='accepted';
     arr[0].save();
     res.send(arr[0]);
@@ -172,6 +184,11 @@ app.put('/reject',verifyJWT,async(req,res)=>{
     console.log("receiver"+receiver._id);
     const arr = await Request.find({ receiver: receiver._id, sender: sender,status:'pending'});
     await Request.deleteMany({ _id: { $in: arr.map(doc => doc._id) } });
+    const io = req.app.get("io");
+    const members = [receiver._id];
+    const getM = getSockets(members);
+    // io.to(getM).emit('REFETCH_CHATS',{ getM});
+    io.to(getM).emit('SHOW_DIALOG',{ getM});
     res.json({msg:"Documents deleted successfully."});
 });
 app.get('/friends',verifyJWT,async(req,res)=>{
@@ -206,7 +223,7 @@ app.get('/friends',verifyJWT,async(req,res)=>{
         }
     
       res.status(200).send(ress);
-})
+});
 app.get('/logout',(req,res)=>{
     try{
     const options = {
@@ -220,7 +237,7 @@ app.get('/logout',(req,res)=>{
         console.log(error);
         res.status(500).json({status:false,content:"Internal server error"});
     }
-})
+});
 
 
 export default app;

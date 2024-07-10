@@ -51,7 +51,7 @@ io.use((socket, next) => {
     async (err) => await socketAuthenticator(err, socket, next)
   );
 });
-
+app.set("io", io);
 io.on("connection", (socket)=>{
   const user = socket.user;
   // console.log('-----');

@@ -1,55 +1,61 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { useEffect } from 'react';
-
+import { getSocket } from '../../socket';
 
 const Chatlist = () => {
-  const Navigate = useNavigate();
-  const [obj,setObj] = useState([]);
-  useEffect(()=>{
-    const fn = async()=>{
-      const response = await fetch('http://localhost:3000/chat/my', {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: 'include'
-    });
-    const json = await response.json();
-    console.log(json);
-    setObj(json.arr);
-    }
-    fn();
-  },[])
+  const navigate = useNavigate();
+  const [obj, setObj] = useState([]);
+  const [c, setC] = useState(1);
+  const socket = getSocket();
 
-  const [selectedChat, setSelectedChat] = useState(null);
+  const refetch_chats = useCallback(() => {
+    setC(prevC => (prevC === 1 ? 0 : 1));
+  }, []);
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      const response = await fetch('http://localhost:3000/chat/my', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      const json = await response.json();
+      console.log(json);
+      setObj(json.arr);
+    };
+    fetchChats();
+  }, [c]);
+
+  useEffect(() => {
+    socket.on('REFETCH_CHATS', refetch_chats);
+    return () => {
+      socket.off('REFETCH_CHATS', refetch_chats);
+    };
+  }, [refetch_chats, socket]);
 
   const handleClick = (id) => {
     console.log(id);
     setSelectedChat(id);
-    Navigate(`/chat/${id}`);
+    navigate(`/chat/${id}`);
   };
+
+  const [selectedChat, setSelectedChat] = useState(null);
 
   return (
     <>
-      
       {obj.map((element, index) => (
         <div
           key={element.id}
           style={{
             width: '100%',
             height: '7%',
-            backgroundColor: 
-            
-            selectedChat === element.id ? '#1976d2' : '#F0FFFF',           
-           color: selectedChat === element.id ? 'white' : 'black',
+            backgroundColor: selectedChat === element.id ? '#1976d2' : '#F0FFFF',
+            color: selectedChat === element.id ? 'white' : 'black',
             display: 'flex',
-            // alignItems : 'center',
-            justifyContent:'space-between',
-            // position: 'relative',
+            justifyContent: 'space-between',
             transition: 'background-color 0.3s',
-            
           }}
           onClick={() => handleClick(element.id)}
         >

@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import { Dialog, DialogTitle, Stack, Button } from '@mui/material';
-
+import { getSocket } from '../../socket';
 const Notifications = (props) => {
   const [open, setOpen] = useState(true);
+  const socket = getSocket();
   const [notf,setNotf] = useState([]);
   const [ue,setUe] = useState(0);
+  const [c, setC] = useState(1);
+  const show_dialog = useCallback(() => {
+    setC(prevC => (prevC === 1 ? 0 : 1));
+  }, []);
   useEffect(()=>{
     const func = async()=>{
       const response = await fetch(`http://localhost:3000/user/fetchRequests`, {
@@ -19,7 +24,13 @@ const Notifications = (props) => {
       setNotf(json);
     };
     func();
-  },[])
+  },[c]);
+  useEffect(() => {
+    socket.on('SHOW_DIALOG', show_dialog);
+    return () => {
+      socket.off('SHOW_DIALOG', show_dialog);
+    };
+  }, [show_dialog, socket]);
   const accept = async(id)=>{
     
     const response = await fetch(`http://localhost:3000/user/accept`, {
