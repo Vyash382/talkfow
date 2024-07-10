@@ -5,6 +5,7 @@ import { upload } from '../middlewares/multur.middleware.js';
 import { Request } from '../models/request.model.js';
 import { Chat } from '../models/chat.model.js';
 import { emitEvent } from '../utility/utils.js';
+import mongoose from 'mongoose';
 const app = express.Router();
 app.use(express.json());
 app.post('/login',login);
@@ -134,9 +135,9 @@ app.put('/accept',verifyJWT,async(req,res)=>{
     // console.log("receiver"+receiver._id);
     const arr = await Request.find({ receiver: receiver._id, sender: sender,status:'pending'});
     // console.log(arr);
-    const userId1 = req.user._id;; // Replace with your first user ID
-    const userId2 = sender; // Replace with your second user ID
-
+    const userId1 = receiver._id;
+    const userId2 = new mongoose.Types.ObjectId(sender);
+    console.log(userId1+"-------------"+userId2);
     const chat = await Chat.findOne({
         $and: [
             { groupchat: false }, // Ensure groupChat is false
@@ -151,6 +152,8 @@ app.put('/accept',verifyJWT,async(req,res)=>{
         ]
     });
     const mem =[userId1,userId2];
+    console.log(chat);
+    console.log('--------');
     if(!chat){
         
         const chat = new Chat({name:"BLC",groupchat:false,creator:userId1,members:mem});

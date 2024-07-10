@@ -4,6 +4,7 @@ import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { emitEvent } from '../utility/utils.js';
 import { User } from '../models/user.model.js';
 import { Message } from '../models/message.model.js';
+import { Request } from '../models/request.model.js';
 // import axios from  'axios';
 const app = express.Router();
 app.use(express.json());
@@ -30,9 +31,10 @@ app.get('/my', verifyJWT, async (req, res) => {
         const id = req.user._id.toString();
         const my_chats = await Chat.find({ members: id });
         const arr =[];
+        console.log(arr+'000000');
         for (let index = 0; index < my_chats.length; index++) {
             const element = my_chats[index];
-            // console.log(element);
+            
             if(element.groupchat=='true'){
                 const obj1 = {
                     name : element.name,
@@ -40,10 +42,23 @@ app.get('/my', verifyJWT, async (req, res) => {
                     id: element._id
                 }
                 arr.push(obj1);
+                console.log(obj1);
             }
             else{
                 
                 if(element.members[0]!=id){
+                    const request1 = await Request.findOne({
+                        sender: element.members[0],
+                        receiver: element.members[1],
+                        status: 'accepted'
+                      });
+                    const request2 = await Request.findOne({
+                        sender: element.members[1],
+                        receiver: element.members[0],
+                        status: 'accepted'
+                      });
+                      console.log(request1+"0001"+request2);
+                      if(request1 || request2){
                     // console.log(id,element.members[0]);
                     // if(element.members[0]!=id){
                     const user = await User.findById(element.members[0]);
@@ -53,11 +68,28 @@ app.get('/my', verifyJWT, async (req, res) => {
                         id: element._id
                     }
                     arr.push(obj1);
+                    console.log(obj1);
+                }
                 // }
                 }
                 else{
-                    console.log(id,element.members[1]);
+                    
                     if(element.members[1]!=id){
+                    const request1 = await Request.findOne({
+                        sender: element.members[1],
+                        receiver: element.members[0],
+                        status: 'accepted'
+                      });
+                    const request2 = await Request.findOne({
+                        sender: element.members[0],
+                        receiver: element.members[1],
+                        status: 'accepted'
+                      });
+                      
+                      console.log(request1+"0002"+request2);
+                    if(request1 || request2){
+                    // console.log(id,element.members[1]);
+                    
                     const user = await User.findById(element.members[1]);
                     const obj1 = {
                         name : user.name,
@@ -65,13 +97,18 @@ app.get('/my', verifyJWT, async (req, res) => {
                         id: element._id
                     }
                     arr.push(obj1);
-                }
+                    console.log(obj1);
+                    }
+                    }
+                
                 }
             }
             
         }
+        
         res.status(200).json({ success: true, arr });
     } catch (error) {
+        console.log(error);
         res.status(400).json({ success: false, error });
     }
 });
