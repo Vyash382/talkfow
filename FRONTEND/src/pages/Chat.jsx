@@ -22,17 +22,16 @@ const Chat = () => {
   const newMessages = useCallback((data) => {
     console.log(data.chatId+" "+params.chatID);
     if(params.chatID==data.chatId){
-    const obj = {
-      'sender._id': data.message.sender._id,
-      'avatar': data.message.sender.avatar,
-      'content': data.message.content
+      const obj = {
+        'sender._id': data.message.sender._id,
+        'avatar': data.message.sender.avatar,
+        'content': data.message.content
+      }
+      setMessages(prevMessages => [...prevMessages, obj]);
     }
-    setMessages(prevMessages => [...prevMessages, obj]);
-  }
   }, [params.chatID]);
 
   useEffect(() => {
-    // setChatId(params.chatID)
     const resetState = () => {
       setPage(1);
       setMessages([]);
@@ -121,6 +120,13 @@ const Chat = () => {
       socket.off('NEW_MESSAGE', newMessages);
     };
   }, [newMessages]);
+
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const dbxHandler = () => {
     setDbx(!dbx);

@@ -159,9 +159,9 @@ app.put('/removeMembers', verifyJWT, async (req, res) => {
     }
 });
 
-app.delete('/leave/:id', verifyJWT, async (req, res) => {
+app.put('/leave', verifyJWT, async (req, res) => {
     try {
-        const chatId = req.params.id;
+        const chatId = req.body.id;
         const chat = await Chat.findById(chatId);
         if (!chat) {
             return res.status(404).json({ success: false, message: "Chat not found" });
@@ -172,9 +172,32 @@ app.delete('/leave/:id', verifyJWT, async (req, res) => {
             chat.creator = chat.members[0];
         }
         await chat.save();
-        emitEvent(req, 'ALERT', chat.members, `${req.user.name} has left`);
-        emitEvent(req, 'REFRESH_CHAT', chat.members);
+        
         return res.status(200).json({ success: true, chat });
+    } catch (error) {
+        return res.status(500).json({ success: false, error });
+    }
+});
+app.put('/kick', verifyJWT, async (req, res) => {
+    try {
+        console.log(req.body.member);
+        const chatId = req.body.id;
+        const tom = req.body.member;
+        const chat = await Chat.findById(chatId);
+        if (!chat) {
+            return res.status(404).json({ success: false, message: "Chat not found" });
+        }
+        const index = chat.members.indexOf(tom.toString());
+        chat.members.splice(index, 1);
+        let r= false;
+        if (chat.creator.toString() === tom.toString()) {
+            chat.creator = chat.members[0];
+            r=true;
+        }
+        console.log(tom+'  90');
+        console.log(chat.members);
+        await chat.save();
+        return res.status(200).json({ success: r});
     } catch (error) {
         return res.status(500).json({ success: false, error });
     }
@@ -193,25 +216,97 @@ app.get('/chat/:id', verifyJWT, async (req, res) => {
     }
 });
 
-app.put('/chat/:id', verifyJWT, async (req, res) => {
+app.put('/changeName', verifyJWT, async (req, res) => {
     try {
+        
         const { name } = req.body;
-        const chatId = req.params.id;
+        const chatId = req.body.id;
         const chat = await Chat.findById(chatId);
         if (!chat) {
             return res.status(404).json({ success: false, message: "Chat not found" });
         }
         chat.name = name;
         await chat.save();
-        res.status(200).json({ success: true, chat });
+        res.status(200).json({ name:chat.name });
     } catch (error) {
         return res.status(500).json({ success: false, error });
     }
 });
 
-app.delete('/chat/:id', verifyJWT, async (req, res) => {
+app.put('/NewMembers', verifyJWT, async (req, res) => {
     try {
-        const chatId = req.params.id;
+        const chatId = req.body.id;
+        const user = req.user;
+        const group = await Chat.findById(chatId);
+        const groupMembers = group.members;
+        const arr = await Request.find({
+            $or: [
+              { receiver: user._id, status: 'accepted' },
+              { sender: user._id, status: 'accepted' }
+            ]
+          });
+          let ress =[];
+        ;
+          
+          for(let i=0;i<arr.length;i++){
+            const obj = arr[i];
+            let friendId;
+            if (obj.sender.toString() === user._id.toString()) {
+                friendId = obj.receiver;
+            } else {
+                friendId = obj.sender;
+            }
+        
+            const friend = await User.findById(friendId);
+            let obj2 = {
+                id: friend._id,
+                name: friend.name,
+                avatar: friend.avatar
+            }
+            ress.push(obj2);
+            }
+            let ress2 =[];
+            for (let index = 0; index < ress.length; index++) {
+                const element = ress[index];
+                if(!groupMembers.includes(element.id)) {
+                    
+                    ress2.push(element);
+                }
+            }
+            console.log(ress2);
+            res.status(200).send(ress2);
+    } catch (error) {
+        return res.status(500).json({ success: false, error });
+    }
+});
+
+app.put('/AddMembs', verifyJWT, async (req, res) => {
+    try {
+        const { id, members } = req.body;
+
+        if (!Array.isArray(members)) {
+            return res.status(400).json({ success: false, error: "Members should be an array" });
+        }
+
+        const group = await Chat.findById(id);
+        if (!group) {
+            return res.status(404).json({ success: false, error: "Group not found" });
+        }
+
+        group.members = [...new Set([...group.members, ...members])];
+
+        await group.save();
+
+        res.status(200).json({ success: true, group });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+
+app.put('/deleteC', verifyJWT, async (req, res) => {
+    try {
+        const chatId = req.body.id;
         const chat = await Chat.findById(chatId);
         if (!chat) {
             return res.status(404).json({ success: false, message: "Chat not found" });
@@ -336,16 +431,51 @@ app.put('/GroupMembers', verifyJWT, async (req, res) => {
         for (let index = 0; index < members.length; index++) {
             const element = members[index];
             const user = await User.findById(element);
+            let r = false;
+            // console.log(group.creator+" "+user._id);
+            if(group.creator.toHexString()==user._id.toHexString()){
+                r=true;
+                const obj = {
+                    Member:{
+                        id:element,
+                        avatar: user.avatar,
+                        name: user.name,
+                        creator : r
+                    },
+                    _id:index
+                }
+                arr.unshift(obj);
+                continue;
+            }
             const obj = {
                 Member:{
+                    id:element,
                     avatar: user.avatar,
-                    name: user.name
+                    name: user.name,
+                    creator : r
                 },
                 _id:index
             }
             arr.push(obj);
         }
         res.status(200).json(arr);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+app.put('/GroupAdmin', verifyJWT, async (req, res) => {
+    try {
+        // console.log('-----');
+        const gid = req.body.id;
+        // console.log(gid);
+        const group = await Chat.findById(gid);
+        console.log(group.creator);
+        console.log(req.user._id);
+        let arr = false;
+        if(group.creator.toHexString()==req.user._id.toHexString()) arr = true;
+        console.log(arr);
+        res.status(200).json({arr});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -379,5 +509,6 @@ app.put('/GroupChange', verifyJWT, async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 export default app;
