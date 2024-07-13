@@ -1,19 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import GroupLayout from '../components/Layouts/GroupLayout'
 import { Button, IconButton } from '@mui/material';
 import { Delete, Edit, Remove } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import ChangeName from './ChangeName';
 import AddMembers from './AddMembers';
+import { getSocket } from '../socket';
 const GroupItem = () => {
+  const socket = getSocket();
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [name,setName] = useState('');
     const [isAdmin,setIsAdmin] = useState(false);
     const [chngName,setChngName] = useState(false);
     const [adM,setAdM] = useState(false);
+    const [c,setC] = useState(1);
     const params = useParams();
     const uri = params.groupID;
+    const kicked = useCallback(() => {
+      console.log('re');
+      navigate('/group');
+    }, []);
+    const refetch_group = useCallback(() => {
+      console.log('re');
+      setC(prevC => (prevC === 1 ? 0 : 1));
+    }, []);
       // },{
       //   "Member":{
       //     "avatar":"https://th.bing.com/th/id/OIP.jryuUgIHWL-1FVD2ww8oWgHaHa?rs=1&pid=ImgDetMain",
@@ -72,7 +83,21 @@ const GroupItem = () => {
         funcc2(uri);
         funcc(uri);
         funcc3(uri);
-      },[uri,chngName,adM]);
+      },[c,uri,adM,chngName]);
+      useEffect(()=>{
+        socket.on('KICKED', kicked);
+        socket.on('REFETCH_GROUP',refetch_group);
+        return () => {
+        socket.off('KICKED', kicked);
+        socket.off('REFETCH_GROUP', refetch_group);
+        };
+      },[socket,kicked,refetch_group]);
+      // useEffect(()=>{
+      //   socket.on('REFETCH_GROUP',refetch_group);
+      //   return () => {
+      //     socket.off('REFETCH_GROUP', refetch_group);
+      //     };
+      // },[socket, refetch_group]);
       const nameHandler = ()=>{
         setChngName(true);
       }

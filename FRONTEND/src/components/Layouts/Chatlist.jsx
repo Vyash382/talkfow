@@ -9,6 +9,7 @@ const Chatlist = () => {
   const socket = getSocket();
 
   const refetch_chats = useCallback(() => {
+    
     setC(prevC => (prevC === 1 ? 0 : 1));
   }, []);
 
@@ -30,8 +31,12 @@ const Chatlist = () => {
 
   useEffect(() => {
     socket.on('REFETCH_CHATS', refetch_chats);
+    socket.on('REFETCH_GROUP',refetch_chats);
+    socket.on('KICKED',refetch_chats);
     return () => {
       socket.off('REFETCH_CHATS', refetch_chats);
+      socket.off('KICKED', refetch_chats);
+      socket.off('REFETCH_GROUP', refetch_chats);
     };
   }, [refetch_chats, socket]);
 

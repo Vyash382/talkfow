@@ -11,16 +11,26 @@ app.use(express.json());
 app.post('/login',login);
 app.post('/signup',upload.single('avatar'),signup);
 app.get('/getUserDetails',verifyJWT,async(req,res)=>{
-    const user =await User.findById(req.user._id);
-    res.status(200).json({name:user.name,username:user.username,avatar:user.avatar});
+    try {
+        const user =await User.findById(req.user._id);
+        res.status(200).json({name:user.name,username:user.username,avatar:user.avatar});
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 app.get('/getMy',verifyJWT,async(req,res)=>{
+    try {
+        const id = req.user._id.toString();
+        res.status(200).json({id:id });
+    } catch (error) {
+        console.log(error);
+    }
     
-    const id = req.user._id.toString();
-    res.status(200).json({id:id });
 });
 app.put('/getUsers', verifyJWT ,async (req, res) => {
-    const { name, username } = req.body;
+    try {
+        const { name, username } = req.body;
     if (!name && !username) {
         res.status(400).json({ status: false, content: "Please enter a value" });
         return;
@@ -42,6 +52,10 @@ app.put('/getUsers', verifyJWT ,async (req, res) => {
     }).select("-password");
     
     res.status(200).json({ status: true, results: users });
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 
 app.post('/addFriend',verifyJWT,async(req,res)=>{
@@ -93,7 +107,8 @@ app.post('/requeststatus',verifyJWT,async(req,res)=>{
     // "receiver":"65fe8246eefb89881215c834"
 });
 app.post('/unsend',verifyJWT,async(req,res)=>{
-    const sender =await User.findById(req.user._id);
+    try {
+        const sender =await User.findById(req.user._id);
     const {receiver} = req.body;
     
     
@@ -119,9 +134,14 @@ app.post('/unsend',verifyJWT,async(req,res)=>{
     io.to(getM).emit('REFETCH_CHATS',{ getM});
     io.to(getM2).emit('SHOW_DIALOG',{ getM2});
     res.status(200).json({ status: true, content: 'Requests deleted' });
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 app.get('/fetchRequests',verifyJWT,async(req,res)=>{
-    const receiver = await User.findById(req.user._id);
+    try {
+        const receiver = await User.findById(req.user._id);
     const array = await Request.find({ receiver: receiver._id, status: 'pending' }, { sender: 1, _id: 0 });
     let arr = [];
     for(let i=0;i<array.length;i++){
@@ -135,9 +155,14 @@ app.get('/fetchRequests',verifyJWT,async(req,res)=>{
         arr[i]=obj;
     }
     res.status(200).send(arr);
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 app.put('/accept',verifyJWT,async(req,res)=>{
-    const receiver = await User.findById(req.user._id);
+    try {
+        const receiver = await User.findById(req.user._id);
     const {sender} = req.body;
     
     
@@ -176,9 +201,14 @@ app.put('/accept',verifyJWT,async(req,res)=>{
     arr[0].status='accepted';
     arr[0].save();
     res.send(arr[0]);
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 app.put('/reject',verifyJWT,async(req,res)=>{
-    const receiver = await User.findById(req.user._id);
+    try {
+        const receiver = await User.findById(req.user._id);
     const {sender} = req.body;
     console.log("sender"+sender);
     console.log("receiver"+receiver._id);
@@ -190,9 +220,14 @@ app.put('/reject',verifyJWT,async(req,res)=>{
     // io.to(getM).emit('REFETCH_CHATS',{ getM});
     io.to(getM).emit('SHOW_DIALOG',{ getM});
     res.json({msg:"Documents deleted successfully."});
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 app.get('/friends',verifyJWT,async(req,res)=>{
-    const user = await User.findById(req.user._id);
+    try {
+        const user = await User.findById(req.user._id);
     console.log(user._id);
     
     const arr = await Request.find({
@@ -223,6 +258,10 @@ app.get('/friends',verifyJWT,async(req,res)=>{
         }
     
       res.status(200).send(ress);
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 app.get('/logout',(req,res)=>{
     try{

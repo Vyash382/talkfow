@@ -37,8 +37,9 @@ const connectToMongo = async () => {
 connectToMongo();
 const port = 3000;
 
-app.use('/user',userRoute);
-app.use('/chat',chatRoute);
+  app.use('/user',userRoute);
+  app.use('/chat',chatRoute);
+
 app.get('/',(req,res)=>{
     res.json({"message":"Hello"});
 });
@@ -100,5 +101,9 @@ io.on("connection", (socket)=>{
 server.listen(port,()=>{
   console.log(process.env.PORT);
   console.log('Server listening on '+port);
+});
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 export {userSocketIds};

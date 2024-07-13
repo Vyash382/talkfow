@@ -52,9 +52,13 @@ const AddGroup = (props) => {
         "Content-Type": "application/json"
       }
     });
+    setGroupMember([]);
+    setGroupName('');
     props.msg2(false);
   };
   const close = ()=>{
+    setGroupMember([]);
+    setGroupName('');
     props.msg2(false);
   }
   return (

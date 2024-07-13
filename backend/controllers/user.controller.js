@@ -26,8 +26,10 @@ const login = async(req, res) => {
             res.status(400).json({ status: false, content: "User does not exist" });
             return;
         }
+        const pw = await bcrypt.hash(password,10);
+        console.log(pw);
         const flag = await user.comparePassword(password);
-        if (flag) {
+        if (!flag) {
             res.status(400).json({ status: false, content: "Please enter the correct credentials" });
             return;
         }
@@ -59,6 +61,7 @@ const signup = async(req, res) => {
             return;
         }
         const password2 = await bcrypt.hash(password, 10);
+        console.log(password2);
         const localpath = req.file.path;
         console.log('--------------------');
         const cres = await uploadOnCloudinary(localpath);

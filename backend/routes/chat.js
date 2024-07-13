@@ -5,12 +5,14 @@ import { emitEvent } from '../utility/utils.js';
 import { User } from '../models/user.model.js';
 import { Message } from '../models/message.model.js';
 import { Request } from '../models/request.model.js';
+import { getSockets } from '../utility/utils.js';
 // import axios from  'axios';
 const app = express.Router();
 app.use(express.json());
 
 app.post('/newGroupChat', verifyJWT, async (req, res) => {
-    const { name, members } = req.body;
+    try {
+        const { name, members } = req.body;
     if (members.length < 2) {
         return res.status(400).json({ success: false, message: "Add more peoples for group chat" });
     }
@@ -21,9 +23,16 @@ app.post('/newGroupChat', verifyJWT, async (req, res) => {
         creator: req.user,
         members: allMembers
     });
-    emitEvent(req, 'ALERT', allMembers, `Welcome to ${name} Group`);
-    emitEvent(req, 'REFETCH_CHATS', members, 'You have been added in a group');
+    const io = req.app.get("io");
+    const mems = allMembers;
+    const getM = getSockets(mems);
+    // io.to(getM).emit('REFETCH_CHATS',{ getM});
+    io.to(getM).emit('REFETCH_CHATS',{ getM});
     res.status(201).json({ success: true, name, members: allMembers });
+    } catch (error) {
+        console.log(error);
+    }
+    
 });
 
 app.get('/my', verifyJWT, async (req, res) => {
@@ -171,8 +180,19 @@ app.put('/leave', verifyJWT, async (req, res) => {
         if (chat.creator.toString() === req.user._id.toString()) {
             chat.creator = chat.members[0];
         }
+
         await chat.save();
-        
+        const io = req.app.get("io");
+        const mems = [];
+        for (let index = 0; index < chat.members.length; index++) {
+            const element = chat.members[index];
+            mems.push(element.toHexString());
+        }
+        console.log(mems);
+        const getM = getSockets(mems);
+        console.log(getM);
+    // io.to(getM).emit('REFETCH_CHATS',{ getM});
+        io.to(getM).emit('REFETCH_GROUP',{ getM});
         return res.status(200).json({ success: true, chat });
     } catch (error) {
         return res.status(500).json({ success: false, error });
@@ -197,6 +217,18 @@ app.put('/kick', verifyJWT, async (req, res) => {
         console.log(tom+'  90');
         console.log(chat.members);
         await chat.save();
+        const io = req.app.get("io");
+        const mems = [tom];
+        const getM = getSockets(mems);
+        io.to(getM).emit('KICKED',{ getM});
+        
+        const mems2 = [];
+        for (let index = 0; index < chat.members.length; index++) {
+            const element = chat.members[index];
+            mems2.push(element.toHexString());
+        }
+        const getM2 = getSockets(mems2);
+        io.to(getM2).emit('REFETCH_GROUP',{ getM2});
         return res.status(200).json({ success: r});
     } catch (error) {
         return res.status(500).json({ success: false, error });
@@ -227,6 +259,17 @@ app.put('/changeName', verifyJWT, async (req, res) => {
         }
         chat.name = name;
         await chat.save();
+        const io = req.app.get("io");
+        
+        const mems = [];
+        for (let index = 0; index < chat.members.length; index++) {
+            const element = chat.members[index];
+            mems.push(element.toHexString());
+        }
+        
+        const getM = getSockets(mems);
+        
+        io.to(getM).emit('REFETCH_GROUP',{ getM});
         res.status(200).json({ name:chat.name });
     } catch (error) {
         return res.status(500).json({ success: false, error });
@@ -294,9 +337,16 @@ app.put('/AddMembs', verifyJWT, async (req, res) => {
         }
 
         group.members = [...new Set([...group.members, ...members])];
-
+        
         await group.save();
-
+        const io = req.app.get("io");
+        const mems = [];
+        for (let index = 0; index < group.members.length; index++) {
+            const element = group.members[index];
+            mems.push(element.toHexString());
+        }
+        const getM = getSockets(mems);
+        io.to(getM).emit('REFETCH_GROUP',{ getM});
         res.status(200).json({ success: true, group });
     } catch (error) {
         return res.status(500).json({ success: false, error: error.message });
@@ -306,8 +356,14 @@ app.put('/AddMembs', verifyJWT, async (req, res) => {
 
 app.put('/deleteC', verifyJWT, async (req, res) => {
     try {
+        const io = req.app.get("io");
         const chatId = req.body.id;
         const chat = await Chat.findById(chatId);
+        const mems = [];
+        for (let index = 0; index < chat.members.length; index++) {
+            const element = chat.members[index];
+            mems.push(element.toHexString());
+        }
         if (!chat) {
             return res.status(404).json({ success: false, message: "Chat not found" });
         }
@@ -315,6 +371,12 @@ app.put('/deleteC', verifyJWT, async (req, res) => {
             return res.status(403).json({ success: false, message: "You are not authorised" });
         }
         await Chat.deleteOne({ _id: chatId });
+        
+        console.log(mems);
+        const getM = getSockets(mems);
+        console.log(getM);
+    // io.to(getM).emit('REFETCH_CHATS',{ getM});
+        io.to(getM).emit('KICKED',{ getM});
         res.status(200).json({ success: true, message: "Chat deleted successfully" });
     } catch (error) {
         return res.status(500).json({ success: false, error });
