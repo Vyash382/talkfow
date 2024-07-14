@@ -19,7 +19,7 @@ const App = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/user/getUserDetails', {
+        const response = await axios.get('https://talkfow-backend-3.onrender.com/user/getUserDetails', {
           withCredentials: true, 
         });
         console.log(response);

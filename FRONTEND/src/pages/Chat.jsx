@@ -39,7 +39,7 @@ const Chat = () => {
 
     const misc = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/user/getMy`, {
+        const response = await fetch(`https://talkfow-backend-3.onrender.com/user/getMy`, {
           method: 'GET',
           credentials: 'include'
         });
@@ -58,7 +58,7 @@ const Chat = () => {
     const preMsg = async (chatId, page) => {
       try {
         console.log(chatId + " " + page);
-        const response = await fetch(`http://localhost:3000/chat/myMessages/${chatId}?page=${page}`, {
+        const response = await fetch(`https://talkfow-backend-3.onrender.com/chat/myMessages/${chatId}?page=${page}`, {
           method: 'GET',
           credentials: 'include'
         });
@@ -86,7 +86,7 @@ const Chat = () => {
       try {
         const formData = { chatId: chatId };
 
-        const response = await fetch('http://localhost:3000/chat/members', {
+        const response = await fetch('https://talkfow-backend-3.onrender.com/chat/members', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },

@@ -7,7 +7,7 @@ const AddGroup = (props) => {
   const [users,setUsers] = useState([]);
   useEffect(()=>{
     const fn = async()=>{
-      const response = await fetch('http://localhost:3000/user/friends', {
+      const response = await fetch('https://talkfow-backend-3.onrender.com/user/friends', {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const AddGroup = (props) => {
       name : groupName,
       members : groupMember
     };
-    const res = await axios.post('http://localhost:3000/chat/newGroupChat', formData, {
+    const res = await axios.post('https://talkfow-backend-3.onrender.com/chat/newGroupChat', formData, {
       withCredentials: true,
       headers: {
         "Content-Type": "application/json"

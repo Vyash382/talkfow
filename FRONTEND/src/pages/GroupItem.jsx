@@ -35,7 +35,7 @@ const GroupItem = () => {
       useEffect(()=>{
         const funcc= async(uri)=>{
           // console.log(uri);
-          const response = await fetch('http://localhost:3000/chat/GroupMembers', {
+          const response = await fetch('https://talkfow-backend-3.onrender.com/chat/GroupMembers', {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -51,7 +51,7 @@ const GroupItem = () => {
           setUsers(json);
         };
         const funcc2 = async()=>{
-          const response = await fetch('http://localhost:3000/chat/GroupName', {
+          const response = await fetch('https://talkfow-backend-3.onrender.com/chat/GroupName', {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -66,7 +66,7 @@ const GroupItem = () => {
           setName(json.name);
         }
         const funcc3=async()=>{
-          const response = await fetch('http://localhost:3000/chat/GroupAdmin', {
+          const response = await fetch('https://talkfow-backend-3.onrender.com/chat/GroupAdmin', {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -105,7 +105,7 @@ const GroupItem = () => {
         setAdM(true);
       }
       const LeaveHandler= async()=>{
-        const response = await fetch('http://localhost:3000/chat/leave', {
+        const response = await fetch('https://talkfow-backend-3.onrender.com/chat/leave', {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -118,7 +118,7 @@ const GroupItem = () => {
         navigate('/group');
       };
       const kickHandler = async(idd)=>{
-        const response = await fetch('http://localhost:3000/chat/kick', {
+        const response = await fetch('https://talkfow-backend-3.onrender.com/chat/kick', {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -133,7 +133,7 @@ const GroupItem = () => {
         if(json.success) navigate('/group');
       }
       const deleteHandler = async()=>{
-        const response = await fetch('http://localhost:3000/chat/deleteC', {
+        const response = await fetch('https://talkfow-backend-3.onrender.com/chat/deleteC', {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

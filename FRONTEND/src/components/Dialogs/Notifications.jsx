@@ -12,7 +12,7 @@ const Notifications = (props) => {
   }, []);
   useEffect(()=>{
     const func = async()=>{
-      const response = await fetch(`http://localhost:3000/user/fetchRequests`, {
+      const response = await fetch(`https://talkfow-backend-3.onrender.com/user/fetchRequests`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,7 @@ const Notifications = (props) => {
   }, [show_dialog, socket]);
   const accept = async(id)=>{
     
-    const response = await fetch(`http://localhost:3000/user/accept`, {
+    const response = await fetch(`https://talkfow-backend-3.onrender.com/user/accept`, {
     method: "PUT",
     headers: {
         "Content-Type": "application/json",
@@ -51,7 +51,7 @@ const Notifications = (props) => {
   }
   const reject = async(id)=>{
     
-    const response = await fetch(`http://localhost:3000/user/reject`, {
+    const response = await fetch(`https://talkfow-backend-3.onrender.com/user/reject`, {
     method: "PUT",
     headers: {
         "Content-Type": "application/json",

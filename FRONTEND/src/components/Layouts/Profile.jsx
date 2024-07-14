@@ -13,7 +13,7 @@ const Profile = (props) => {
     
     try {
       dispatch(UserNotExists());
-      const response = await axios.get('http://localhost:3000/user/logout', {
+      const response = await axios.get('https://talkfow-backend-3.onrender.com/user/logout', {
         withCredentials: true, 
       });
       

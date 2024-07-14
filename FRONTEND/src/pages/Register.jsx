@@ -36,7 +36,7 @@ const Register = () => {
     formData2.append('email', email);
     formData2.append('password', password);
     formData2.append('avatar', selectedPhoto);
-    const response = await fetch(`http://localhost:3000/user/signup`,{
+    const response = await fetch(`https://talkfow-backend-3.onrender.com/user/signup`,{
           method: "POST",
             
             body: formData2

@@ -15,7 +15,7 @@ const Chatlist = () => {
 
   useEffect(() => {
     const fetchChats = async () => {
-      const response = await fetch('http://localhost:3000/chat/my', {
+      const response = await fetch('https://talkfow-backend-3.onrender.com/chat/my', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +41,8 @@ const Chatlist = () => {
   }, [refetch_chats, socket]);
 
   const handleClick = (id) => {
-    console.log(id);
+    // console.log
+    (id);
     setSelectedChat(id);
     navigate(`/chat/${id}`);
   };

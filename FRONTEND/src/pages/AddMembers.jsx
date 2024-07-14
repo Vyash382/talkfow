@@ -7,7 +7,7 @@ const AddMembers = (props) => {
   const [users,setUsers] = useState([]);
   useEffect(()=>{
     const fn = async()=>{
-      const response = await fetch('http://localhost:3000/chat/NewMembers', {
+      const response = await fetch('https://talkfow-backend-3.onrender.com/chat/NewMembers', {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +49,7 @@ const AddMembers = (props) => {
       id:props.uri,
       members : groupMember
     };
-    const response = await fetch('http://localhost:3000/chat/AddMembs', {
+    const response = await fetch('https://talkfow-backend-3.onrender.com/chat/AddMembs', {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

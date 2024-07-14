@@ -10,7 +10,7 @@ const Grouplist = () => {
    
     useEffect(()=>{
        const funcc = async()=>{
-        const response = await fetch('http://localhost:3000/chat/myGroupChats', {
+        const response = await fetch('https://talkfow-backend-3.onrender.com/chat/myGroupChats', {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -24,7 +24,7 @@ const Grouplist = () => {
     })
 
     const handleClick = (id) => {
-        setSelectedGroup(id); // Set the selected group ID
+        setSelectedGroup(id); 
         navigate(`/group/${id}`)
     };
 

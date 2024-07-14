@@ -8,7 +8,7 @@ const ChangeName = (props) => {
         onC(false);
     }
     const onSubmit = async()=>{
-        const response = await fetch('http://localhost:3000/chat/changeName', {
+        const response = await fetch('https://talkfow-backend-3.onrender.com/chat/changeName', {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

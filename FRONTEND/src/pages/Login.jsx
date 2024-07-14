@@ -29,7 +29,7 @@ const Login = ({ setUser }) => {
     e.preventDefault();
     // console.log("Hii");
     try {
-      const res = await axios.post('http://localhost:3000/user/login', formData, {
+      const res = await axios.post('https://talkfow-backend-3.onrender.com/user/login', formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json"
@@ -47,7 +47,7 @@ const Login = ({ setUser }) => {
   return (
     <>
       <div style={{ height: '100%', width: '100%', position: 'fixed', zIndex: '-1' }}>
-        <img src="https://www.wallpapertip.com/wmimgs/82-825704_cool-backgrounds-for-twitch.jpg" style={{ objectFit: 'cover' }} alt="" />
+        <img src="https://wallpapercave.com/wp/wp9764093.jpg" style={{ objectFit: 'cover' }} alt="" />
       </div>
       <div
         style={{

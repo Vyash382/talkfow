@@ -47,7 +47,7 @@ app.get('/my', verifyJWT, async (req, res) => {
             if(element.groupchat=='true'){
                 const obj1 = {
                     name : element.name,
-                    avatar : 'https://th.bing.com/th/id/OIP.kg6yJds7NHwm0Zz1AXOyBgHaEK?w=310&h=180&c=7&r=0&o=5&dpr=1.6&pid=1.7',
+                    avatar : 'https://images.idgesg.net/images/article/2017/08/group-chat-thinkstock-465520267-100732964-large.jpg?auto=webp',
                     id: element._id
                 }
                 arr.push(obj1);
@@ -470,7 +470,7 @@ app.get('/myGroupChats', verifyJWT, async (req, res) => {
         for (let index = 0; index < arr.length; index++) {
             const element = arr[index];
             const obj = {
-                p_pic : "https://th.bing.com/th/id/OIP.y8tWWY6Vh7BX50XtbsIcnwHaFe?rs=1&pid=ImgDetMain",
+                p_pic : "https://images.idgesg.net/images/article/2017/08/group-chat-thinkstock-465520267-100732964-large.jpg?auto=webp",
                 _id : element._id,
                 name : element.name
             }

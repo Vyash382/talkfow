@@ -6,7 +6,7 @@ const Myself = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/user/getUserDetails`, {
+        const response = await fetch(`https://talkfow-backend-3.onrender.com/user/getUserDetails`, {
           method: "GET",
           credentials: 'include'
         });

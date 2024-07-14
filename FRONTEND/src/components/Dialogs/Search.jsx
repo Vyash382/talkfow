@@ -8,7 +8,7 @@ const Search = (props) => {
 
   useEffect(() => {
     const handleSearch = async () => {
-      const response = await fetch(`http://localhost:3000/user/getUsers`, {
+      const response = await fetch(`https://talkfow-backend-3.onrender.com/user/getUsers`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

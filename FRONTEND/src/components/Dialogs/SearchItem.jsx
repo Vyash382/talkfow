@@ -7,7 +7,7 @@ const SearchItem = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/user/requeststatus', {
+        const response = await fetch('https://talkfow-backend-3.onrender.com/user/requeststatus', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -35,7 +35,7 @@ const SearchItem = (props) => {
   }, [clic]);
   const addFriend = async (id) => {
     if(vari=='Add'){
-      const response = await fetch('http://localhost:3000/user/addFriend', {
+      const response = await fetch('https://talkfow-backend-3.onrender.com/user/addFriend', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,7 +48,7 @@ const SearchItem = (props) => {
     return;
     };
     if(vari=='Unsend' || vari=='Unfriend'){
-      const response = await fetch('http://localhost:3000/user/unsend', {
+      const response = await fetch('https://talkfow-backend-3.onrender.com/user/unsend', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
